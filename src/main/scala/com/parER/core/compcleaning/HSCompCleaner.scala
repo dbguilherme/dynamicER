@@ -3,6 +3,7 @@ package com.parER.core.compcleaning
 import com.parER.core.Config
 import com.parER.datastructure.Comparison
 import org.scify.jedai.textmodels.TokenNGrams
+import org.apache.spark.ml.classification.LogisticRegression
 
 import scala.collection.mutable
 
@@ -10,13 +11,6 @@ class HSCompCleaner extends ComparisonCleaning {
 
   val ccer = Config.ccer
 
-  override def execute(comparisons: List[Comparison]) = {
-    if (comparisons.size == 0)
-      comparisons
-    else {
-      removeRedundantComparisons(comparisons)
-    }
-  }
 
   override def execute(id: Int, model: TokenNGrams, ids: List[Int]) = {
     if (ids.size == 0)
