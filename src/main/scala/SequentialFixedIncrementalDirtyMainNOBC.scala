@@ -65,7 +65,7 @@ object SequentialFixedIncrementalDirtyMainNOBC extends App {
     // STEP 2. functional stages
     val tokenizer = new Tokenizer
     val tokenBlocker = Blocking.apply(Config.blocker, profiles1.size, 0, Config.cuttingRatio, Config.filteringRatio)
-    val compCleaner = ComparisonCleaning.apply(Config.ccMethod)
+    val compCleaner = ComparisonCleaning.apply(Config.ccMethod,dp)
     val compMatcher = new JSMatcher
     val proCollector = new ProgressiveCollector(t0, System.currentTimeMillis(), dp, Config.print)
     val blockGhoster = new BlockGhosting(Config.filteringRatio)

@@ -3,6 +3,7 @@ package com.parER.core.compcleaning
 import com.parER.core.Config
 import com.parER.datastructure.Comparison
 import org.scify.jedai.textmodels.TokenNGrams
+import org.scify.jedai.utilities.datastructures.AbstractDuplicatePropagation
 
 import scala.collection.mutable
 

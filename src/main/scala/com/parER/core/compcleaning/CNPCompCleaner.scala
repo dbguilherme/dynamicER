@@ -2,8 +2,9 @@ package com.parER.core.compcleaning
 
 import com.parER.datastructure.Comparison
 import org.scify.jedai.textmodels.TokenNGrams
+import org.scify.jedai.utilities.datastructures.AbstractDuplicatePropagation
 
-class CNPCompCleaner extends HSCompCleaner {
+class CNPCompCleaner(dp: AbstractDuplicatePropagation) extends HSCompCleaner {
 
   override def execute(comparisons: List[Comparison]) = {
     if (comparisons.size == 0)

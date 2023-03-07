@@ -53,7 +53,7 @@ object AkkaStreamSequentialDirtyMain {
     }
 
     val tokenBlocker = new TokenBlockerStage(Config.blocker, profiles1.size, 0, Config.cuttingRatio, Config.filteringRatio)
-    val compCleaner = (lc: List[Comparison]) => ComparisonCleaning.apply(Config.ccMethod).execute(lc)
+    val compCleaner = (lc: List[Comparison]) => ComparisonCleaning.apply(Config.ccMethod,dp).execute(lc)
     val matcherFun = (c: Comparison) => {c.sim = c.e1Model.getSimilarity(c.e2Model); c}
     val matcher = (lc: List[Comparison]) => lc.map(matcherFun)
 

@@ -2,6 +2,7 @@ package com.parER.core.compcleaning
 
 import com.parER.datastructure.Comparison
 import org.scify.jedai.textmodels.TokenNGrams
+import org.scify.jedai.utilities.datastructures.AbstractDuplicatePropagation
 
 trait ComparisonCleaning {
   def execute(comparisons: List[Comparison]) : List[Comparison]
@@ -9,10 +10,10 @@ trait ComparisonCleaning {
 }
 
 object ComparisonCleaning {
-  def apply(name: String) = name match {
-    case "hs" => new HSCompCleaner
-    case "wnp" => new WNPCompCleaner
-    case "wnp2" => new WNP2CompCleaner
-    case "cnp" => new CNPCompCleaner
+  def apply(name: String, dp: AbstractDuplicatePropagation) = name match {
+   // case "hs" => new HSCompCleaner(dp)
+    case "wnp" => new WNPCompCleaner(dp)
+    case "wnp2" => new WNP2CompCleaner(dp)
+    case "cnp" => new CNPCompCleaner(dp)
   }
 }
