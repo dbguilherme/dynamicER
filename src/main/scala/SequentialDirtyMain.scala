@@ -98,14 +98,16 @@ object SequentialDirtyMain extends App {
         cBlocker += comps1.size
 
         t = System.currentTimeMillis()
+        storeModel.solveUpdate(id1, obj1)
+        comps1 = storeModel.solveComparisons(comps1)
+        tStoreModel += (System.currentTimeMillis() - t)
+
+        t = System.currentTimeMillis()
         comps1 = compCleaner.execute(comps1)
         tCompCleaner += (System.currentTimeMillis() - t)
         cCompCleaner += comps1.size
 
-        t = System.currentTimeMillis()
-        storeModel.solveUpdate(id1, obj1)
-        comps1 = storeModel.solveComparisons(comps1)
-        tStoreModel += (System.currentTimeMillis() - t)
+
 
         t = System.currentTimeMillis()
         comps1 = compMatcher.execute(comps1)

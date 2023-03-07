@@ -13,7 +13,7 @@ import org.scify.jedai.utilities.datastructures.AbstractDuplicatePropagation
 
 import java.io.IOException
 import java.util
-import java.util.Random
+import java.util.{HashSet, Random, Set}
 
 
 class WNP2CompCleaner(dp: AbstractDuplicatePropagation) extends HSCompCleaner {
@@ -22,24 +22,37 @@ class WNP2CompCleaner(dp: AbstractDuplicatePropagation) extends HSCompCleaner {
 
    val duplicates=dp.getDuplicates
 
-    private var numberSamplesCorrect: Int = 0;
+    private var Tp: Int = 0;
     private var numberSamples: Int = 0;
-    private var numberSamplesInCorrect: Int = 0;
+    private var Tn: Int = 0;
+    private var Fp: Int = 0;
+    private var Fn: Int = 0;
 
 
     private var numberSamplesCorrectOriginal: Int = 0;
     private var numberSamplesInCorrectOriginal: Int = 0;
 
     private var inst:Instance = createInstance()
+    private var learner:HoeffdingTree = createClassifier()
+    private def createClassifier() : HoeffdingTree = {
+      learner = new HoeffdingTree();
+      val stream = new RandomRBFGenerator();
+      stream.prepareForUse();
+
+      learner.setModelContext(stream.getHeader());
+      learner.prepareForUse();
+      learner
+    }
+
     private def createInstance(): DenseInstance = {
       // generates the name of the features which is called as InstanceHeader
       //val attributes = new Nothing
       var attributes = new util.ArrayList[Attribute]()
-      for (i <- 0 until 1) {
+      for (i <- 0 until 3) {
         attributes.add(new Attribute("feature_" + i))
       }
       // create instance header with generated feature name
-      val streamHeader = new InstancesHeader(new Instances("Mustafa Çelik Instance", attributes, 2));
+      val streamHeader = new InstancesHeader(new Instances("Mustafa Çelik Instance", attributes, 10));
       streamHeader.setClassIndex(2)
       // generates random data
       val data = new Array[Double](3)
@@ -49,11 +62,11 @@ class WNP2CompCleaner(dp: AbstractDuplicatePropagation) extends HSCompCleaner {
       //    }
       //    data(2)=1
       // creates an instance and assigns the data
-      val instancia = new DenseInstance(1.0, data)
+      val instance = new DenseInstance(1.0, data)
       // assigns the instanceHeader(feature name)
-      instancia.setDataset(streamHeader)
+      instance.setDataset(streamHeader)
 
-      instancia
+      instance
     }
 
   override def execute(comparisons: List[Comparison]) = {
@@ -67,13 +80,8 @@ class WNP2CompCleaner(dp: AbstractDuplicatePropagation) extends HSCompCleaner {
 
 //
 //
-      val learner = new HoeffdingTree();
-      val stream = new RandomRBFGenerator();
 
-      stream.prepareForUse();
 
-      learner.setModelContext(stream.getHeader());
-      learner.prepareForUse();
 
 
 
@@ -82,13 +90,30 @@ class WNP2CompCleaner(dp: AbstractDuplicatePropagation) extends HSCompCleaner {
       //while (stream.hasMoreInstances() && numberSamples < 10) {
       for (cmp <- cmps){
 
+        val commonKeysA = cmp.e1Model.getItemsFrequency.size()
+//        commonKeys.retainAll(cmp.e2Model.getItemsFrequency.keySet)
+
+        val commonKeysB = cmp.e2Model.getItemsFrequency.size()
+//        println(commonKeysA )
+//        println(commonKeysB )
+//        println(cmp.e2Model.getItemsFrequency.size())
+
+        val commonKeys = new util.HashSet[String](cmp.e1Model.getItemsFrequency.keySet)
+        commonKeys.retainAll(cmp.e2Model.getItemsFrequency.keySet)
+
+        val numerator:Double = commonKeys.size
+        val denominator:Double = cmp.e1Model.getItemsFrequency.size + cmp.e2Model.getItemsFrequency.size - numerator
+        val sim=numerator / denominator
+        println("siml =",sim )
 
 
-        inst.setValue(0,cmp.sim)
-        inst.setValue(1,w)
+        var e= cmp.e1Model.getItemsFrequency//getSimilarity(cmp.e2Model)
+        //println("---",e)
+        inst.setValue(0,0)
+        inst.setValue(1,sim)
         val (a, b) = (duplicates.contains(new IdDuplicates(cmp.e1, cmp.e2)), duplicates.contains(new IdDuplicates(cmp.e2, cmp.e1)))
         if (a || b) {
-               inst.setClassValue(2,0.0)
+               inst.setClassValue(2,1)
               if(cmp.sim>=w )
                 numberSamplesCorrectOriginal+=1
               else
@@ -96,7 +121,7 @@ class WNP2CompCleaner(dp: AbstractDuplicatePropagation) extends HSCompCleaner {
 
 
         } else {
-          inst.setClassValue(2,0.0)
+          inst.setClassValue(2,0)
           if (cmp.sim >= w)
             numberSamplesInCorrectOriginal += 1
           else
@@ -105,30 +130,22 @@ class WNP2CompCleaner(dp: AbstractDuplicatePropagation) extends HSCompCleaner {
 
         var label=learner.correctlyClassifies(inst)
         println(inst.toString, " label ",label , a , b)
-
-         if (a || b) {
-           if (label)
-             numberSamplesCorrect += 1;
-           else
-             numberSamplesInCorrect += 1
-         }
-         else{
-             if (label) {
-               numberSamplesInCorrect += 1;
-             } else {
-               numberSamplesCorrect += 1
-             };
-           }
+        learner.getVotesForInstance(inst).foreach(println)
+    if(label)
+      Tp+=1
+    else
+      Tn+=1
 
 
         numberSamples += 1;
        // if (numberSamples<10)
           learner.trainOnInstance(inst);
+        println("instancia é " , inst.toString)
       }
-      val accuracy = 100.0 * numberSamplesCorrect/ numberSamples;
+      //val accuracy = 100.0 * numberSamplesCorrect/ numberSamples;
 
-      println(" instances processed with " + accuracy + "% accuracy ", "true posi", numberSamplesCorrect , "  numberSamplesInCorrect ",numberSamplesInCorrect);
-      println(" instances processed with " + accuracy + "% accuracy ", "true posi", numberSamplesCorrectOriginal , "  numberSamplesInCorrect ",numberSamplesInCorrectOriginal);
+      println(" instances processed with "  + "% accuracy ", "tp", Tp , "  fn ",Fn, " Fp  ",Fp, " Tn ", Tn);
+      println(" instances processed with "  + "% accuracy ", "true posi", numberSamplesCorrectOriginal , "  numberSamplesInCorrect ",numberSamplesInCorrectOriginal);
 
       cmps
     }
