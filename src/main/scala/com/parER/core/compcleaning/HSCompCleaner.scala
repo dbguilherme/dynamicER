@@ -7,7 +7,7 @@ import org.scify.jedai.utilities.datastructures.AbstractDuplicatePropagation
 
 import scala.collection.mutable
 
-class HSCompCleaner extends ComparisonCleaning {
+class HSCompCleaner  extends ComparisonCleaning {
 
   val ccer = Config.ccer
 
@@ -61,6 +61,16 @@ class HSCompCleaner extends ComparisonCleaning {
     distinctAndCount(comparisons, _.e1, 0)
   }
 
+  def getRecall ():Double={
+    0.0
+  }
+
+
+  def getPrecision(): Double = {
+    0.0
+  }
+
+
   private def distinctAndCount(comparisons: List[Comparison], f: Comparison => Int, idx: Int) = {
     if (comparisons.size == 1) {
       comparisons.head.sim = 1
@@ -78,8 +88,10 @@ class HSCompCleaner extends ComparisonCleaning {
         if (seen.add(id)) {
           next.sim = 1
           builder(id) = next
+
         } else {
           builder(id).sim += 1.0
+          //builder(id).blockSize += next.blockSize
           different = true
         }
       }

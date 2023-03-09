@@ -22,8 +22,8 @@ class CompGeneration {
   def generateComparisons(idx: Int, textModel: TokenNGrams, blocks: List[List[Int]]) : List[Comparison] = {
     val comparisons = List.newBuilder[Comparison]
     (textModel.getDatasetId, Config.ccer) match {
-      case (_, false) | (1, true) => for (block <- blocks; i <- block) comparisons.addOne(Comparison(i, null, idx, textModel))
-      case(0, true) => for (block <- blocks; i <- block) comparisons.addOne(Comparison(idx, textModel, i, null))
+      case (_, false) | (1, true) => for (block <- blocks; i <- block) comparisons.addOne(Comparison(i, null, idx, textModel,blockSize=blocks.size))
+      case(0, true) => for (block <- blocks; i <- block) comparisons.addOne(Comparison(idx, textModel, i, null,blockSize=blocks.size))
     }
     comparisons.result()
   }

@@ -25,7 +25,7 @@ class StoreModel(size1: Int = 16, size2: Int = 16) {
         comparisons.map(c => new Comparison(c.e1, c.e1Model, c.e2, mi(c.e2)))
       } else {
         val mi = getIndexForRetrieve(head.e2Model.getDatasetId)
-        comparisons.map(c => new Comparison(c.e1, mi(c.e1), c.e2, c.e2Model))
+        comparisons.map(c => new Comparison(c.e1, mi(c.e1), c.e2, c.e2Model,blockSize=c.blockSize))
       }
       cmps
     } else
