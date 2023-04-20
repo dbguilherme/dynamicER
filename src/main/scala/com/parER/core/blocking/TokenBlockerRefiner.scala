@@ -28,7 +28,7 @@ class TokenBlockerRefiner(size1: Int, size2: Int = 0, ro: Double = 0.005, ff: Do
     // generate comparisons
     val comparisons = invertedIndex.generate(idx, textModel, associatedBlocks.map(e => e._1), modelStoring)
     invertedIndex.update(idx, textModel, associatedBlocksWithZeroSize.map(e=> e._1) ++ associatedBlocks.map(e => e._1), modelStoring)
-
+   // invertedIndex.blockIndex.
     //if (comparisons.size > 0)
     //  comparisons.head.counters(0) = associatedBlocks.size
 
@@ -51,6 +51,7 @@ class TokenBlockerRefiner(size1: Int, size2: Int = 0, ro: Double = 0.005, ff: Do
     val blocks = associatedBlocks.map(e => e._2.toList)
     val tuple = (idx, textModel, blocks)
     invertedIndex.update(idx, textModel, associatedBlocksWithZeroSize.map(e=> e._1) ++ associatedBlocks.map(e => e._1), modelStoring)
+    invertedIndex.updateBlocking(idx,tuple)
     tuple
   }
 

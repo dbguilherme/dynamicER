@@ -71,7 +71,7 @@ class ProgressiveCollector(t0: Long, t1: Long, dp: AbstractDuplicatePropagation,
       val dt1 = t - t1
       val s = s"${ecX}\t${nworkers}\t${dt0}\t${dt1}\t${rec}\t${em}\t${duplicates.size}\t${if (Config.filling) 1 else 0}"
       buffer.addOne(s)
-      println(s)
+      //println(s)
     }
   }
 
@@ -84,7 +84,7 @@ class ProgressiveCollector(t0: Long, t1: Long, dp: AbstractDuplicatePropagation,
     val dt1 = t - t1
     val s = s"${ecX}\t${nworkers}\t${dt0}\t${dt1}\t${rec}\t${em}\t${duplicates.size}\t${if (Config.filling) 1 else 0}\t${ec}\t${pq}"
     buffer.addOne(s)
-    println(s)
+    //println(s)
   }
 
   def writeFile(filename: String): Unit = {

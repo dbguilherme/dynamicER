@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="jedai-ui">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../JedAIToolkit/jedai-ui.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

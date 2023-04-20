@@ -72,7 +72,7 @@ object AkkaPipelineMicroBatchOptimizedSequentialCCMain {
     // STEP 2. Initialize stream stages and flow
     implicit val system = ActorSystem("StreamingER")
     implicit val ec = system.dispatcher
-    println(ec.toString)
+    //println(ec.toString)
 
     val tokenizer = (lc: Seq[((EntityProfile, Int), Long)]) =>  {
       lc.map( x => x match {case ((e,dId),id) => TokenizerFun.execute(id.toInt, dId, e)} )
