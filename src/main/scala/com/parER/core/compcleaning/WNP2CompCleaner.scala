@@ -136,10 +136,10 @@ class WNP2CompCleaner(dp: AbstractDuplicatePropagation) extends HSCompCleaner {
                inst.setClassValue(2,1)
               if(cmp.sim>=w )
                 TpO+=1
-              else {
+              else
                 FnO+=1
 
-              }
+
         } else {
           inst.setClassValue(2,0)
           if (cmp.sim >= w)
@@ -151,18 +151,15 @@ class WNP2CompCleaner(dp: AbstractDuplicatePropagation) extends HSCompCleaner {
         var label=learner.correctlyClassifies(inst)
         //println(inst.toString, " label ",label , a , b)
         var prediction = learner.getPredictionForInstance(inst)
-//        var vet =learner.getVotesForInstance(inst)
-//          vet foreach println
-//        println()
-      //if(numberSamplesPos>10) {
+        var vet =learner.getVotesForInstance(inst)
+          vet foreach println
+        println()
+      if(numberSamplesPos>10) {
         if (a || b) {
           if (Utils.maxIndex(learner.getVotesForInstance(inst)) == 1)
             Tp += 1
-          else {
+          else
             Fn += 1
-            println("insta value",inst.toString, " ", cmp.e1Model.getItemsFrequency)
-            println("insta value",inst.toString, " ", cmp.e2Model.getItemsFrequency)
-          }
         }
         else {
           if (Utils.maxIndex(learner.getVotesForInstance(inst)) == 1)
@@ -170,12 +167,12 @@ class WNP2CompCleaner(dp: AbstractDuplicatePropagation) extends HSCompCleaner {
           else
             Tn += 1
         }
-      //}
+      }
 
         numberSamples += 1;
         if (inst.classValue()==1)
           numberSamplesPos += 1;
-        if (numberSamplesPos<10)
+       // if (Tp<5)
        // if (numberSamplesPos < (duplicates.size()/2))
           learner.trainOnInstance(inst);
        // println("instancia é " , inst.toString)
@@ -183,13 +180,13 @@ class WNP2CompCleaner(dp: AbstractDuplicatePropagation) extends HSCompCleaner {
       //val accuracy = 100.0 * numberSamplesCorrect/ numberSamples;
 
 
-      if (numberSamples>8750) {
+      //if (numberSamples>8750) {
         println("Proposta instances processed with "  + "% accuracy ", "tp", Tp , "  fn ",Fn, " Fp  ",Fp, " Tn ", Tn);
         println("recall ", (Tp:Double) / (Tp + Fn), " precision ", (Tp:Double) / (Tp + Fp))
         println("Original instances processed with " + "% accuracy ", "tp", TpO, "  fn ", FnO, " Fp  ", FpO, " Tn ", TnO);
         println("recall ", (TpO:Double) / (TpO + FnO), " precision ", (TpO:Double) / (TpO + FpO))
         println()
-      }
+     // }
       cmps
     }
   }

@@ -7,36 +7,22 @@ import scala.collection.mutable.{HashMap, ListBuffer}
 
 class InvertedIndex {
 
-
-
   val invertedIndex = Array(
     new HashMap[String, ListBuffer[Int]]() { override def apply(key: String) = super.getOrElseUpdate(key, ListBuffer())},
     new HashMap[String, ListBuffer[Int]]() { override def apply(key: String) = super.getOrElseUpdate(key, ListBuffer())})
   val modelIndex = Array( HashMap[Int, TokenNGrams](), HashMap[Int, TokenNGrams]())
   val ccer = Config.ccer
 
-  val blockIndex =new HashMap[Int, List[Int]]() { override def apply(key: Int) = super.getOrElseUpdate(key, List())}
-
   def update(idx: Int, textModel: TokenNGrams, textModelTokens: List[String], storeModel: Boolean = true): Unit = {
     val (mi, ii) = getIndexesForUpdate(textModel.getDatasetId)
     for (token <- textModelTokens) {
       ii(token) += idx
-      //println(ii(token))
     }
     if (storeModel)
       mi(idx) = textModel
   }
-  def updateBlocking(idx: Int, tuple: (Int, TokenNGrams, List[List[Int]])) {
-    for ((t)  <- tuple._3){
-      blockIndex(idx)=t
-
-    }
-    println(blockIndex(idx))
-
-  }
 
   // TODO guarantee correct order: e1(0) - e2(1) is a different comparison than e2(0) - e1(1)
-
   def generate(idx: Int, textModel: TokenNGrams, textModelTokens: List[String], storeModel: Boolean = true) = {
     val comparisons = List.newBuilder[Comparison]
     val dId = textModel.getDatasetId
