@@ -13,7 +13,7 @@ import org.scify.jedai.utilities.datastructures.BilateralDuplicatePropagation
 
 object SequentialCCMain extends App {
     import scala.jdk.CollectionConverters._
-
+47
     val maxMemory = Runtime.getRuntime().maxMemory() / math.pow(10, 6)
 
     // Time variables

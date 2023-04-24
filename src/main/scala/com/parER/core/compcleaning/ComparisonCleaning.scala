@@ -16,6 +16,7 @@ object ComparisonCleaning {
     //case "hs" => new HSCompCleaner(dp)
     case "wnp" => new WNPCompCleaner(dp)
     case "wnp2" => new WNP2CompCleaner(dp)
+    case "wnp3" => new WNP3CompCleaner(dp)
     case "cnp" => new CNPCompCleaner(dp)
   }
 

@@ -109,8 +109,6 @@ object SequentialDirtyMain extends App {
 
         cCompCleaner += comps1.size
 
-
-
         t = System.currentTimeMillis()
         comps1 = compMatcher.execute(comps1)
 
