@@ -39,11 +39,13 @@ class WNP3CompCleaner(dp: AbstractDuplicatePropagation) extends HSCompCleaner {
   private var inst:Instance = createInstance()
   private var learner: HoeffdingTree = createClassifier()
   private def createClassifier() = {
-    learner = new HoeffdingTree()
-
-    //val stream = new RandomRBFGenerator();//new NaiveBayes();
+    //learner = new HoeffdingTree()
+    var learner = new RandomRBFGenerator();//new NaiveBayes();
     //stream.prepareForUse();
-
+    learner.removePoorAttsOption.setValue(true);
+    learner.noPrePruneOption.setValue(true);
+    learner.splitConfidenceOption.setValue(1);
+    //learner.deactivateAllLeaves()
     // learner.setModelContext(stream.getHeader());
     learner.prepareForUse();
     learner
@@ -52,8 +54,6 @@ class WNP3CompCleaner(dp: AbstractDuplicatePropagation) extends HSCompCleaner {
     val recall= (Tp:Double) / (Tp + Fn)//, " precision ", (Tp:Double) / (Tp + Fp))
     recall
   }
-
-
 
   override def getPrecision(): Double = {
     val
@@ -94,59 +94,38 @@ class WNP3CompCleaner(dp: AbstractDuplicatePropagation) extends HSCompCleaner {
     else {
       var cmps = removeRedundantComparisons(comparisons)
       val w = cmps.foldLeft(0.0)( (v, c) => v + c.sim).toDouble / cmps.size
-      //cmps = cmps.filter(_.sim >= w)
-
-
-      //
-      //
-
-
-
-
+      cmps = cmps.filter(_.sim >= w/3)
 
       val preciseCPUTiming = TimingUtils.enablePreciseTiming();
       val evaluateStartTime = TimingUtils.getNanoCPUTimeOfCurrentThread();
-      //while (stream.hasMoreInstances() && numberSamples < 10) {
+
       for (cmp <- cmps){
-
-        val commonKeysA = cmp.e1Model.getItemsFrequency.size()
-        //        commonKeys.retainAll(cmp.e2Model.getItemsFrequency.keySet)
-
-        val commonKeysB = cmp.e2Model.getItemsFrequency.size()
-        //        println(commonKeysA )
-        //        println(commonKeysB )
-        //        println(cmp.e2Model.getItemsFrequency.size())
-
-        //val commonKeys = new util.HashSet[String](cmp.e1Model.getItemsFrequency.keySet)
-        // commonKeys.retainAll(cmp.e2Model.getItemsFrequency.keySet)
 
         val numerator:Double = cmp.sim
         val denominator:Double = cmp.e1Model.getItemsFrequency.size + cmp.e2Model.getItemsFrequency.size - numerator
         val sim=numerator / denominator
-        //println("siml =",sim )
 
 
-        var e= cmp.e1Model.getItemsFrequency//getSimilarity(cmp.e2Model)
-        //println("---",e)
         inst.setValue(0,(1.0)/cmp.blockSize)
         inst.setValue(1,sim)
         inst.setValue(2,cmp.e1Model.getItemsFrequency.size)
         inst.setValue(3,cmp.e2Model.getItemsFrequency.size)
-        inst.setValue(4,numerator)
+        inst.setValue(4,w)
 
         //println(cmp.blockSize)
 
         val (a, b) = (duplicates.contains(new IdDuplicates(cmp.e1, cmp.e2)), duplicates.contains(new IdDuplicates(cmp.e2, cmp.e1)))
+        if(a || b){
+          inst.setClassValue(1.0)
+        }else
+          inst.setClassValue(0.0)
+
         if (a || b) {
-          inst.setClassValue(2,1)
           if(cmp.sim>=w )
             TpO+=1
           else
             FnO+=1
-
-
         } else {
-          inst.setClassValue(2,0)
           if (cmp.sim >= w)
             FpO += 1
           else
@@ -154,19 +133,19 @@ class WNP3CompCleaner(dp: AbstractDuplicatePropagation) extends HSCompCleaner {
         }
 
         var label=learner.correctlyClassifies(inst)
-        //println(inst.toString, " label ",label , a , b)
-        var prediction = learner.getPredictionForInstance(inst)
-        var vet =learner.getVotesForInstance(inst)
-        //  vet foreach println
-        //println()
+
+
         //if(numberSamplesPos>10) {
           if (a || b) {
             if (Utils.maxIndex(learner.getVotesForInstance(inst)) == 1)
               Tp += 1
-            else
+            else {
               Fn += 1
+              println(" ",inst.toString , " --- ", w)
+            }
           }
           else {
+            cmp.filterflag=1
             if (Utils.maxIndex(learner.getVotesForInstance(inst)) == 1)
               Fp += 1
             else
@@ -174,35 +153,31 @@ class WNP3CompCleaner(dp: AbstractDuplicatePropagation) extends HSCompCleaner {
           }
       //  }
 
-        numberSamples += 1;
-        if (inst.classValue()==1)
-          numberSamplesPos += 1;
+//        numberSamples += 1;
+//        if (inst.classValue()==1)
+//          numberSamplesPos += 1;
 
 
-        // if (numberSamplesPos < (duplicates.size()/2))
-        if (Tp<5)
-          learner.trainOnInstance(inst);
-        // println("instancia é " , inst.toString)
+        if (Tp<10)
+          learner.trainOnInstanceImpl(inst);
       }
 
-      //val accuracy = 100.0 * numberSamplesCorrect/ numberSamples;
 
 
-      if (numberSamples>8750) {
+      if (Tp>99) {
         println("Proposta instances processed with "  + "% accuracy ", "tp", Tp , "  fn ",Fn, " Fp  ",Fp, " Tn ", Tn);
         println("recall ", (Tp:Double) / (Tp + Fn), " precision ", (Tp:Double) / (Tp + Fp))
         println("Original instances processed with " + "% accuracy ", "tp", TpO, "  fn ", FnO, " Fp  ", FpO, " Tn ", TnO);
         println("recall ", (TpO:Double) / (TpO + FnO), " precision ", (TpO:Double) / (TpO + FpO))
         println()
       }
-      println("cmp size ", cmps.size)
-      print("size==",cmps.exists(_.filterflag == true))
+//      println("cmp size ", cmps.size)
+//      print("size==",cmps.exists(_.filterflag == true))
 
 
 
-      ///cmps = cmps.filter(_.filterflag == true)
-      println("cmp size ", cmps.size)
-      cmps
+      var res  = cmps.filter(_.filterflag == 0) //note working!!!
+      res
     }
   }
 
