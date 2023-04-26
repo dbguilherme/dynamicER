@@ -40,11 +40,11 @@ class WNP3CompCleaner(dp: AbstractDuplicatePropagation) extends HSCompCleaner {
   private var learner: HoeffdingTree = createClassifier()
   private def createClassifier() = {
     //learner = new HoeffdingTree()
-    var learner = new RandomRBFGenerator();//new NaiveBayes();
+    var learner = new HoeffdingTree();//new NaiveBayes();
     //stream.prepareForUse();
-    learner.removePoorAttsOption.setValue(true);
-    learner.noPrePruneOption.setValue(true);
-    learner.splitConfidenceOption.setValue(1);
+//    learner.removePoorAttsOption.setValue(true);
+//    learner.noPrePruneOption.setValue(true);
+//    learner.splitConfidenceOption.setValue(1);
     //learner.deactivateAllLeaves()
     // learner.setModelContext(stream.getHeader());
     learner.prepareForUse();
@@ -92,9 +92,10 @@ class WNP3CompCleaner(dp: AbstractDuplicatePropagation) extends HSCompCleaner {
     if (comparisons.size == 0)
       comparisons
     else {
+      val clean_comparisons = List.newBuilder[Comparison]
       var cmps = removeRedundantComparisons(comparisons)
       val w = cmps.foldLeft(0.0)( (v, c) => v + c.sim).toDouble / cmps.size
-      cmps = cmps.filter(_.sim >= w/3)
+      //cmps = cmps.filter(_.sim >= w/3)
 
       val preciseCPUTiming = TimingUtils.enablePreciseTiming();
       val evaluateStartTime = TimingUtils.getNanoCPUTimeOfCurrentThread();
@@ -120,64 +121,68 @@ class WNP3CompCleaner(dp: AbstractDuplicatePropagation) extends HSCompCleaner {
         }else
           inst.setClassValue(0.0)
 
-        if (a || b) {
-          if(cmp.sim>=w )
-            TpO+=1
-          else
-            FnO+=1
-        } else {
-          if (cmp.sim >= w)
-            FpO += 1
-          else
-            TnO += 1
-        }
+//        if (a || b) {
+//          if(cmp.sim>=w )
+//            TpO+=1
+//          else
+//            FnO+=1
+//        } else {
+//          if (cmp.sim >= w)
+//            FpO += 1
+//          else
+//            TnO += 1
+//        }
 
-        var label=learner.correctlyClassifies(inst)
+        //var label=learner.correctlyClassifies(inst)
+
+        var votes=Utils.maxIndex(learner.getVotesForInstance(inst))
+        if (votes==1)
+          clean_comparisons.addOne(cmp)
+        //  {
 
 
-        //if(numberSamplesPos>10) {
           if (a || b) {
-            if (Utils.maxIndex(learner.getVotesForInstance(inst)) == 1)
+            if (votes == 1) {
               Tp += 1
+            }
             else {
               Fn += 1
-              println(" ",inst.toString , " --- ", w)
+              println("instancia ", inst.toString , " ", numberSamplesPos)
             }
           }
           else {
-            cmp.filterflag=1
-            if (Utils.maxIndex(learner.getVotesForInstance(inst)) == 1)
+            if (votes==1) {
               Fp += 1
-            else
+            } else
               Tn += 1
           }
-      //  }
 
-//        numberSamples += 1;
-//        if (inst.classValue()==1)
-//          numberSamplesPos += 1;
+        numberSamples += 1;
+        if (votes==1)
+          numberSamplesPos += 1;
 
 
-        if (Tp<10)
+        if (numberSamplesPos<10)
           learner.trainOnInstanceImpl(inst);
       }
 
 
 
-      if (Tp>99) {
-        println("Proposta instances processed with "  + "% accuracy ", "tp", Tp , "  fn ",Fn, " Fp  ",Fp, " Tn ", Tn);
-        println("recall ", (Tp:Double) / (Tp + Fn), " precision ", (Tp:Double) / (Tp + Fp))
-        println("Original instances processed with " + "% accuracy ", "tp", TpO, "  fn ", FnO, " Fp  ", FpO, " Tn ", TnO);
-        println("recall ", (TpO:Double) / (TpO + FnO), " precision ", (TpO:Double) / (TpO + FpO))
-        println()
-      }
+//      if (Tp%100==0)
+//      {
+//        println("Proposta instances processed with "  + "% accuracy ", "tp", Tp , "  fn ",Fn, " Fp  ",Fp, " Tn ", Tn);
+//        println("recall ", (Tp:Double) / (Tp + Fn), " precision ", (Tp:Double) / (Tp + Fp))
+//        println("Original instances processed with " + "% accuracy ", "tp", TpO, "  fn ", FnO, " Fp  ", FpO, " Tn ", TnO);
+//        println("recall ", (TpO:Double) / (TpO + FnO), " precision ", (TpO:Double) / (TpO + FpO))
+//        println()
+//      }
 //      println("cmp size ", cmps.size)
 //      print("size==",cmps.exists(_.filterflag == true))
 
 
 
-      var res  = cmps.filter(_.filterflag == 0) //note working!!!
-      res
+      //var res  = cmps.filter(_.filterflag == 0) //note working!!!
+      clean_comparisons.result()
     }
   }
 

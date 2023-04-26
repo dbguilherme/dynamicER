@@ -107,6 +107,8 @@ object SequentialDirtyMain extends App {
 
         tCompCleaner += (System.currentTimeMillis() - t)
 
+
+
         cCompCleaner += comps1.size
 
         t = System.currentTimeMillis()
@@ -120,10 +122,9 @@ object SequentialDirtyMain extends App {
 
         i += 1
     }
-
+    println("recall---", compCleaner.getRecall(), " ---precision--- ", compCleaner.getPrecision())
     proCollector.printLast()
-    println("get recall " , compCleaner.getRecall())
-    println("get Precision " , compCleaner.getPrecision())
+
     println("\nTime measurements: ")
     println("tTokenizer = " + tTokenizer + " ms")
     println("tBlocker = " + tBlocker + " ms")
@@ -133,6 +134,7 @@ object SequentialDirtyMain extends App {
     println("tStoreModel = " + tStoreModel + " ms")
 
     println("PC = " + proCollector.getPC)
+
     println("Comparisons after blocking: " + cBlocker)
     println("Comparisons after comparison cleaning: " + cCompCleaner)
 
