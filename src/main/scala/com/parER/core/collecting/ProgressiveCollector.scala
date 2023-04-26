@@ -69,7 +69,7 @@ class ProgressiveCollector(t0: Long, t1: Long, dp: AbstractDuplicatePropagation,
       val t = System.currentTimeMillis()
       val dt0 = t - t0
       val dt1 = t - t1
-      val s = s"${ecX}\t${nworkers}\t${dt0}\t${dt1}\t${rec}\t${em}\t${duplicates.size}\t${if (Config.filling) 1 else 0}"
+      val s = s"${ecX}\t${nworkers}\t${dt0}\t${dt1}\t${rec}\t${em}\t${duplicates.size}\t${if (Config.filling) 1 else 0} \t ${ec}"
       buffer.addOne(s)
       println(s)
     }

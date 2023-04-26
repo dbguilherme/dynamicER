@@ -40,8 +40,9 @@ class WNP3CompCleaner(dp: AbstractDuplicatePropagation) extends HSCompCleaner {
   private var learner: HoeffdingTree = createClassifier()
   private def createClassifier() = {
     //learner = new HoeffdingTree()
-    var learner = new HoeffdingTree();//new NaiveBayes();
+    var learner = new HoeffdingTree;//new NaiveBayes();
     //stream.prepareForUse();
+
 //    learner.removePoorAttsOption.setValue(true);
 //    learner.noPrePruneOption.setValue(true);
 //    learner.splitConfidenceOption.setValue(1);
@@ -108,10 +109,10 @@ class WNP3CompCleaner(dp: AbstractDuplicatePropagation) extends HSCompCleaner {
 
 
         inst.setValue(0,(1.0)/cmp.blockSize)
-        inst.setValue(1,sim)
+        inst.setValue(1,cmp.sim)
         inst.setValue(2,cmp.e1Model.getItemsFrequency.size)
         inst.setValue(3,cmp.e2Model.getItemsFrequency.size)
-        inst.setValue(4,w)
+        inst.setValue(4,sim)
 
         //println(cmp.blockSize)
 
@@ -162,7 +163,7 @@ class WNP3CompCleaner(dp: AbstractDuplicatePropagation) extends HSCompCleaner {
           numberSamplesPos += 1;
 
 
-        if (numberSamplesPos<10)
+        if (numberSamplesPos<1)
           learner.trainOnInstanceImpl(inst);
       }
 
