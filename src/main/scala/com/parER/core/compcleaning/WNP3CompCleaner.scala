@@ -15,7 +15,7 @@ import org.scify.jedai.utilities.datastructures.AbstractDuplicatePropagation
 import java.io.IOException
 import java.util
 import java.util.{HashSet, Random, Set}
-
+import moa.classifiers.active.ALUncertainty
 
 class WNP3CompCleaner(dp: AbstractDuplicatePropagation) extends HSCompCleaner {
 
@@ -37,10 +37,13 @@ class WNP3CompCleaner(dp: AbstractDuplicatePropagation) extends HSCompCleaner {
   private var FnO: Int = 0;
 
   private var inst:Instance = createInstance()
-  private var learner: HoeffdingTree = createClassifier()
+  private var learner: AbstractClassifier = createClassifier()
   private def createClassifier() = {
     //learner = new HoeffdingTree()
-    var learner = new HoeffdingTree;//new NaiveBayes();
+    //var learner = new HoeffdingTree;//new NaiveBayes();
+    var learner = new ALUncertainty;
+    learner.budgetOption.setValue(0.3);
+    learner.activeLearningStrategyOption.setValue(0);
     //stream.prepareForUse();
 
 //    learner.removePoorAttsOption.setValue(true);
@@ -57,8 +60,7 @@ class WNP3CompCleaner(dp: AbstractDuplicatePropagation) extends HSCompCleaner {
   }
 
   override def getPrecision(): Double = {
-    val
-    precision = (Tp:Double) / (Tp + Fp)
+    val precision = (Tp:Double) / (Tp + Fp)
     precision
   }
 
@@ -77,10 +79,7 @@ class WNP3CompCleaner(dp: AbstractDuplicatePropagation) extends HSCompCleaner {
     // generates random data
     val data = new Array[Double](6)
     val random = new Random()
-    //    for (i <- 0 until 2) {
-    //      data( i ) = random.nextDouble
-    //    }
-    //    data(2)=1
+
     // creates an instance and assigns the data
     val instance = new DenseInstance(1.0, data)
     // assigns the instanceHeader(feature name)
@@ -122,17 +121,17 @@ class WNP3CompCleaner(dp: AbstractDuplicatePropagation) extends HSCompCleaner {
         }else
           inst.setClassValue(0.0)
 
-//        if (a || b) {
-//          if(cmp.sim>=w )
-//            TpO+=1
-//          else
-//            FnO+=1
-//        } else {
-//          if (cmp.sim >= w)
-//            FpO += 1
-//          else
-//            TnO += 1
-//        }
+        if (a || b) {
+          if(cmp.sim>=w )
+            TpO+=1
+          else
+            FnO+=1
+        } else {
+          if (cmp.sim >= w)
+            FpO += 1
+          else
+            TnO += 1
+        }
 
         //var label=learner.correctlyClassifies(inst)
 
@@ -148,7 +147,7 @@ class WNP3CompCleaner(dp: AbstractDuplicatePropagation) extends HSCompCleaner {
             }
             else {
               Fn += 1
-              println("instancia ", inst.toString , " ", numberSamplesPos)
+              //println("instancia ", inst.toString , " ", numberSamplesPos)
             }
           }
           else {
@@ -163,27 +162,21 @@ class WNP3CompCleaner(dp: AbstractDuplicatePropagation) extends HSCompCleaner {
           numberSamplesPos += 1;
 
 
-        if (numberSamplesPos<1)
+      //  if (numberSamplesPos<100)
           learner.trainOnInstanceImpl(inst);
       }
-
-
-
-//      if (Tp%100==0)
-//      {
-//        println("Proposta instances processed with "  + "% accuracy ", "tp", Tp , "  fn ",Fn, " Fp  ",Fp, " Tn ", Tn);
-//        println("recall ", (Tp:Double) / (Tp + Fn), " precision ", (Tp:Double) / (Tp + Fp))
-//        println("Original instances processed with " + "% accuracy ", "tp", TpO, "  fn ", FnO, " Fp  ", FpO, " Tn ", TnO);
-//        println("recall ", (TpO:Double) / (TpO + FnO), " precision ", (TpO:Double) / (TpO + FpO))
-//        println()
-//      }
-//      println("cmp size ", cmps.size)
-//      print("size==",cmps.exists(_.filterflag == true))
-
-
-
       //var res  = cmps.filter(_.filterflag == 0) //note working!!!
+      var measurements= learner.getModelMeasurements()
+
+      for (i <- measurements) {
+        print("measu ", i.toString , ' ');
+      }
+      println()
+
+
+
       clean_comparisons.result()
+
     }
   }
 
