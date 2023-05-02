@@ -1,20 +1,12 @@
 package com.parER.core.compcleaning
 
 import com.parER.datastructure.Comparison
-import com.yahoo.labs.samoa.instances
+import com.yahoo.labs.samoa.instances._
+import moa.classifiers.trees.HoeffdingTree
 import org.scify.jedai.textmodels.TokenNGrams
-import moa.classifiers.trees.{HoeffdingOptionTree, HoeffdingTree}
-import moa.classifiers.{AbstractClassifier, Classifier}
-import moa.core.{TimingUtils, Utils}
-import moa.streams.generators.RandomRBFGenerator
-import com.yahoo.labs.samoa.instances.{Attribute, DenseInstance, Instance, Instances, InstancesHeader}
-import moa.classifiers.bayes.NaiveBayes
-import org.scify.jedai.datamodel.IdDuplicates
 import org.scify.jedai.utilities.datastructures.AbstractDuplicatePropagation
 
-import java.io.IOException
 import java.util
-import java.util.{HashSet, Random, Set}
 
 
 class WNP2CompCleaner(dp: AbstractDuplicatePropagation) extends HSCompCleaner {
@@ -85,6 +77,7 @@ class WNP2CompCleaner(dp: AbstractDuplicatePropagation) extends HSCompCleaner {
       var cmps = removeRedundantComparisons(comparisons)
       val w = cmps.foldLeft(0.0)( (v, c) => v + c.sim).toDouble / cmps.size
       cmps = cmps.filter(_.sim >= w)
+
 
       cmps
     }

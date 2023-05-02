@@ -49,7 +49,7 @@ class WNP3CompCleaner(dp: AbstractDuplicatePropagation) extends HSCompCleaner {
     //learner = new HoeffdingTree()
     //var learner = new HoeffdingTree;//new NaiveBayes();
     var learner = new ALUncertainty;
-    learner.budgetOption.setValue(0.4);
+    learner.budgetOption.setValue(0.1);
     learner.activeLearningStrategyOption.setChosenIndex(1)
     learner.baseLearnerOption.setCurrentObject(new HoeffdingTree)
     //stream.prepareForUse();

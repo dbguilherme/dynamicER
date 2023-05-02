@@ -90,6 +90,10 @@ class HSCompCleaner  extends ComparisonCleaning {
 
         } else {
           builder(id).sim += 1.0
+
+          //salva o menor blocking key
+          if (builder(id).blockingKey>next.blockingKey)
+            builder(id).blockingKey=next.blockingKey
           //builder(id).blockSize += next.blockSize
           different = true
         }

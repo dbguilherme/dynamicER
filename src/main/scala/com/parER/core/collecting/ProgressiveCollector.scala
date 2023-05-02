@@ -20,6 +20,8 @@ class ProgressiveCollector(t0: Long, t1: Long, dp: AbstractDuplicatePropagation,
   val nworkers = Config.workers
 
   def execute(comparisons: List[Comparison]) = {
+    //println("new block ")
+
     for (cmp <- comparisons) {
       executeCmp(cmp)
     }
@@ -32,14 +34,19 @@ class ProgressiveCollector(t0: Long, t1: Long, dp: AbstractDuplicatePropagation,
     }
     if ( !Config.ccer ) {
       val (a, b) = (duplicates.contains(new IdDuplicates(cmp.e1, cmp.e2)), duplicates.contains(new IdDuplicates(cmp.e2, cmp.e1)))
-      if (a || b)
+      if (a || b) {
         (a, b) match {
           case (true, _) => update(cmp.e1, cmp.e2)
           case (_, true) => update(cmp.e2, cmp.e1)
         }
+
+      println("dup ", cmp.e2, " ", cmp.e1, "blocking  size ",cmp.blockSize, " similaridade ", cmp.sim,  " key ", cmp.blockingKey, " --" , em , " -- ", ec)
+      }
+        //println()
+
     }
-    if (printAll)
-      print()
+//    if (printAll)
+//      print()
     ec += 1
   }
 

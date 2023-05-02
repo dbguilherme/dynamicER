@@ -46,7 +46,16 @@ class TokenBlockerRefiner(size1: Int, size2: Int = 0, ro: Double = 0.005, ff: Do
     process(idx, textModel, keys)
   }
 
-  override def process(idx: Int, textModel: TokenNGrams, keys: List[String]) = {
+  override def processPrefix(idx: Int, textModel: TokenNGrams) = {
+    import scala.jdk.CollectionConverters._
+
+    //Pega somente as assinaturas para chaves (keys) de blocos
+    val keys = textModel.getSignatures.asScala.toList
+    //println("Keys toList: " + textModelTokens.toList)
+
+    processPrefix(idx, textModel, keys)
+  }
+  override def processPrefix(idx: Int, textModel: TokenNGrams, keys: List[String]) = {
 
     // Cria um map para ordenar frequencia das chaves do registro
     val keysFreqRegistro = collection.mutable.Map[String, Integer]()
@@ -61,6 +70,8 @@ class TokenBlockerRefiner(size1: Int, size2: Int = 0, ro: Double = 0.005, ff: Do
       //Guarda as chaves dos registros com sua frequencia atual
       keysFreqRegistro += (key -> frequencyKeys.get(key).intValue)
     }
+    if (idx == 27621)
+      print("teste ")
     //println("\nFrequencia das Chaves:\n" + frequencyKeys.toString)
     //System.in.read()
 
@@ -69,12 +80,12 @@ class TokenBlockerRefiner(size1: Int, size2: Int = 0, ro: Double = 0.005, ff: Do
      **/
 
     var prefix = 0
-    val n = 100
+    val n = 500
     if(idx < n)
       prefix = keysFreqRegistro.size
     else
     {
-      val p = (keysFreqRegistro.size / 3).toInt
+      val p = (keysFreqRegistro.size / 2).toInt
       //val p=5
       if(p >= 1)
         prefix = p
@@ -86,7 +97,6 @@ class TokenBlockerRefiner(size1: Int, size2: Int = 0, ro: Double = 0.005, ff: Do
 
     // Ordena o map de chaves pelo valor de frequencia
     val keysOrdFreq = keysFreqRegistro.toSeq.sortBy(_._2)
-    //println(keysOrdFreq)
 
     //Seleciona as chaves (ordenadas pela frequencia) pelo tamanho do prefixo
     val keysPrefix = keysOrdFreq.take(prefix)
@@ -102,13 +112,18 @@ class TokenBlockerRefiner(size1: Int, size2: Int = 0, ro: Double = 0.005, ff: Do
     // get view of the hash map for later generation of comparisons
     //val view = invertedIndex.getModelIndexView(idx, textModel.getDatasetId, associatedBlocks.map(e => e._1))
     // build tuple and update inverted index data structure
-    val blocks = associatedBlocks.map(e => e._2.toList)
-    val tuple = (idx, textModel, blocks)
+
+
+    //corta os blocos com tamanho maior que 10 TESTE
+    //val xxx = associatedBlocks.filter(_._2.size<10)
+    val blocks = associatedBlocks.map(a => a._2.toList)
+    val tuple = (idx, textModel, blocks,associatedBlocks)
     //Insere o registro de consulta nos blocos selecionados
     invertedIndex.update(idx, textModel, associatedBlocksWithZeroSize.map(e=> e._1) ++ associatedBlocks.map(e => e._1), modelStoring)
 
-    tuple
+    (tuple)
   }
+  //Fim do process
 
   def getBlocks(idx: Int, dId: Int, keys: List[String]) =
   {

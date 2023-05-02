@@ -4,6 +4,8 @@ import com.parER.datastructure.InvertedIndex
 import gnu.trove.map.hash.TObjectIntHashMap
 import org.scify.jedai.textmodels.TokenNGrams
 
+import scala.collection.mutable.ListBuffer
+
 class TokenBlocker extends Blocking {
 
   val invertedIndex = new InvertedIndex
@@ -49,5 +51,23 @@ class TokenBlocker extends Blocking {
     val tuple = (idx, textModel, blocks)
     invertedIndex.update(idx, textModel, associatedBlocks.keys.toList, modelStoring)
     tuple
+  }
+
+  override def processPrefix(idx: Int, textModel: TokenNGrams) = {
+    import scala.jdk.CollectionConverters._
+    val textModelTokens = textModel.getSignatures.asScala.toList
+    processPrefix(idx, textModel, textModelTokens)
+  }
+
+  override def processPrefix(idx: Int, textModel: TokenNGrams, keys: List[String]): (Int, TokenNGrams, List[List[Int]], List[(String, ListBuffer[Int])]) = {
+    val dId = textModel.getDatasetId
+    // get blocks and apply block cutting and first step of block filtering
+    val associatedBlocks = invertedIndex.getBlocks(idx, dId, keys)
+    // build tuple and update inverted index data structure
+    val blocks = associatedBlocks.values.map(_.toList).toList
+    val tuple = (idx, textModel, blocks,associatedBlocks.toList)
+    invertedIndex.update(idx, textModel, associatedBlocks.keys.toList, modelStoring)
+    tuple
+
   }
 }

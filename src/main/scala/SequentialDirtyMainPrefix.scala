@@ -1,4 +1,5 @@
 
+import SequentialDirtyMain.labelcost
 import com.parER.core.blocking.{BlockGhosting, Blocking, CompGeneration, StoreModel}
 import com.parER.core.collecting.ProgressiveCollector
 import com.parER.core.compcleaning.ComparisonCleaning
@@ -93,6 +94,10 @@ object SequentialDirtyMainPrefix extends App {
         //var tFinal = 0.0D
         //var tInicial = 0L
 
+        if (i==27621) {
+            var z=1
+        }
+
         //tInicial = System.currentTimeMillis() //Retorna um inteiro long em millesegundos
         t = System.nanoTime()
         val (id1, obj1) = tokenizer.execute(i, 0, profiles1(i))
@@ -102,7 +107,7 @@ object SequentialDirtyMainPrefix extends App {
         //println("\nTokens Chaves de Blocos: " + obj1.getSignatures.size())
 
         t = System.nanoTime()
-        val tuple = tokenBlocker.process(id1, obj1)
+        val tuple = tokenBlocker.processPrefix(id1, obj1)
         tBlocker += (System.nanoTime() - t) * 1E-6
         tTotalRegistro += (System.nanoTime() - t) * 1E-6
         /** tuple._3 contém os blocos referente ao registro de consulta **/
@@ -123,6 +128,17 @@ object SequentialDirtyMainPrefix extends App {
         tTotalRegistro += (System.nanoTime() - t) * 1E-6
         //println("Pares Candidatos Gerados = " + comps1.size)
 
+        /** Os blocos mantém apenas os ID's dos registros.
+         * O storeModel é a etapa Flm que recupera os registros com os tokens antes da fase de comparação.
+         * Para isso, o Flm mantém um mapa de perfil PM. PM serve como um índice para pesquisar um registro completo que foi determinado para exigir comparação com o registro de consulta processado atualmente.
+         * */
+        t = System.nanoTime()
+        storeModel.solveUpdate(id1, obj1)
+        comps1 = storeModel.solveComparisons(comps1)
+        tStoreModel += (System.nanoTime() - t) * 1E-6
+        tTotalRegistro += (System.nanoTime() - t) * 1E-6
+
+
         t = System.nanoTime()
         comps1 = compCleaner.execute(comps1)
         cCompCleaner += comps1.size
@@ -131,15 +147,8 @@ object SequentialDirtyMainPrefix extends App {
         //println("Pares Candidatos Apos Meta-blocking = " + comps1.size)
         //println("Pares Candidatos Sem Redundancia = " + comps1.size) //comps1.toList
 
-        /** Os blocos mantém apenas os ID's dos registros.
-            O storeModel é a etapa Flm que recupera os registros com os tokens antes da fase de comparação.
-            Para isso, o Flm mantém um mapa de perfil PM. PM serve como um índice para pesquisar um registro completo que foi determinado para exigir comparação com o registro de consulta processado atualmente.
-         **/
-        t = System.nanoTime()
-        storeModel.solveUpdate(id1, obj1)
-        comps1 = storeModel.solveComparisons(comps1)
-        tStoreModel += (System.nanoTime() - t) * 1E-6
-        tTotalRegistro += (System.nanoTime() - t) * 1E-6
+
+
 
         t = System.nanoTime()
         comps1 = compMatcher.execute(comps1) //Calcula similaridade de jaccard igual a 0
@@ -160,9 +169,9 @@ object SequentialDirtyMainPrefix extends App {
 
         val line = List[String](tTotalRegistro.toString.replace('.' , ','))
         //csv.newLine(line)
-        if (i%1000==0) {
-            println("Registro " + i + " de " + proCollector.getPC())
-        }
+//        if (i%1000==0) {
+//            println("Registro " + i + " de " + proCollector.getPC())
+//        }
         i += 1
     }
 
@@ -171,7 +180,7 @@ object SequentialDirtyMainPrefix extends App {
     //proCollector.printLast()
 
     println(s"\nMax memory: ${maxMemory} MB")
-
+    println("recall---", compCleaner.getRecall(), " ---precision--- ", compCleaner.getPrecision() , "  cost  ", labelcost)
     println("\n------------------------------ \n------------------------------ \n\nTime measurements:\n")
 
     println("tTokenizer = " + tTokenizer.toInt + " ms")
