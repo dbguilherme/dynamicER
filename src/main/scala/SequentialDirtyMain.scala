@@ -1,5 +1,4 @@
 
-import SequentialCCMain.{blockGhoster, cBlocker, compGeneration, dataset1, proCollector, storeModel, tBlockGhosting, tBlocker, tCollector, tCompCleaner, tCompGeneration, tMatcher, tStoreModel, tTokenizer, tokenBlocker}
 import com.parER.core.blocking.{BlockGhosting, Blocking, CompGeneration, StoreModel}
 import com.parER.core.collecting.ProgressiveCollector
 import com.parER.core.compcleaning.ComparisonCleaning
@@ -70,7 +69,7 @@ object SequentialDirtyMain extends App {
 
     val storeModel = new StoreModel
     tokenBlocker.setModelStoring(!smBool)
-
+    var labelcost=0.0;
     val t1 = System.currentTimeMillis()
     // STEP 3. iterative computation -> (Assume CCER)
     var i = 0
@@ -107,7 +106,7 @@ object SequentialDirtyMain extends App {
 
         tCompCleaner += (System.currentTimeMillis() - t)
         cCompCleaner += comps1.size
-
+        labelcost=compCleaner.getLabelCost()
         t = System.currentTimeMillis()
         comps1 = compMatcher.execute(comps1)
 
@@ -119,7 +118,7 @@ object SequentialDirtyMain extends App {
 
         i += 1
     }
-    println("recall---", compCleaner.getRecall(), " ---precision--- ", compCleaner.getPrecision())
+    println("recall---", compCleaner.getRecall(), " ---precision--- ", compCleaner.getPrecision() , "  cost  ", labelcost)
     proCollector.printLast()
 
     println("\nTime measurements: ")
@@ -129,7 +128,7 @@ object SequentialDirtyMain extends App {
     println("tMatcher = " + tMatcher + " ms")
     println("tCollector = " + tCollector + " ms")
     println("tStoreModel = " + tStoreModel + " ms")
-
+    println("labelling cost = " + labelcost + " pairs")
     println("PC = " + proCollector.getPC)
 
     println("Comparisons after blocking: " + cBlocker)

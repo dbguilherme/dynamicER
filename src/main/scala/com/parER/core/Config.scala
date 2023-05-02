@@ -23,7 +23,7 @@ object Config {
   var pOption2 = 50L
   var print = true
   var blocker = "tbr"
-  var ccMethod = "wnp3"
+  var ccMethod = "wnp2"
   var matcher = "js"
   var file = ""
   var output = false
@@ -31,6 +31,7 @@ object Config {
   var blockers = 1
   var storeModel = true
   var batches = 1
+  var print2 = true //true para imprimir estatisticas das bases de dados
 
   var filling = false
 

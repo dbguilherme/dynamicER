@@ -34,5 +34,5 @@ class BFCompCleaner(val fpRate: Double) extends ComparisonCleaning {
 
   override def execute(id: Int, model: TokenNGrams, ids: List[Int]): (Int, TokenNGrams, List[Int]) = (id, model, ids)
 
-  override def getPrecision(): Double = ???
+  override def getLabelCost(): Int = 0
 }

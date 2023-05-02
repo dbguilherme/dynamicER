@@ -1,21 +1,17 @@
 package com.parER.core.compcleaning
 
 import com.parER.datastructure.Comparison
-import com.yahoo.labs.samoa.instances
-import org.scify.jedai.textmodels.TokenNGrams
-import moa.classifiers.trees.{HoeffdingOptionTree, HoeffdingTree}
-import moa.classifiers.{AbstractClassifier, Classifier}
+import com.yahoo.labs.samoa.instances._
+import moa.classifiers.AbstractClassifier
+import moa.classifiers.active.ALUncertainty
+import moa.classifiers.trees.HoeffdingTree
 import moa.core.{TimingUtils, Utils}
-import moa.streams.generators.RandomRBFGenerator
-import com.yahoo.labs.samoa.instances.{Attribute, DenseInstance, Instance, Instances, InstancesHeader}
-import moa.classifiers.bayes.NaiveBayes
 import org.scify.jedai.datamodel.IdDuplicates
+import org.scify.jedai.textmodels.TokenNGrams
 import org.scify.jedai.utilities.datastructures.AbstractDuplicatePropagation
 
-import java.io.IOException
 import java.util
-import java.util.{HashSet, Random, Set}
-import moa.classifiers.active.ALUncertainty
+import java.util.Random
 
 class WNP3CompCleaner(dp: AbstractDuplicatePropagation) extends HSCompCleaner {
 
@@ -36,19 +32,31 @@ class WNP3CompCleaner(dp: AbstractDuplicatePropagation) extends HSCompCleaner {
   private var FpO: Int = 0;
   private var FnO: Int = 0;
 
+  private var labelcost:Int=0;
+
   private var inst:Instance = createInstance()
   private var learner: AbstractClassifier = createClassifier()
+
+  //function to return the variable labelcost
+  override def getLabelCost():Int={
+    labelcost
+  }
+
+
+
+
   private def createClassifier() = {
     //learner = new HoeffdingTree()
     //var learner = new HoeffdingTree;//new NaiveBayes();
     var learner = new ALUncertainty;
-    learner.budgetOption.setValue(0.3);
-    learner.activeLearningStrategyOption.setValue(0);
+    learner.budgetOption.setValue(0.4);
+    learner.activeLearningStrategyOption.setChosenIndex(1)
+    learner.baseLearnerOption.setCurrentObject(new HoeffdingTree)
     //stream.prepareForUse();
 
-//    learner.removePoorAttsOption.setValue(true);
-//    learner.noPrePruneOption.setValue(true);
-//    learner.splitConfidenceOption.setValue(1);
+    //    learner.removePoorAttsOption.setValue(true);
+    //    learner.noPrePruneOption.setValue(true);
+    //    learner.splitConfidenceOption.setValue(1);
     //learner.deactivateAllLeaves()
     // learner.setModelContext(stream.getHeader());
     learner.prepareForUse();
@@ -141,38 +149,33 @@ class WNP3CompCleaner(dp: AbstractDuplicatePropagation) extends HSCompCleaner {
         //  {
 
 
-          if (a || b) {
-            if (votes == 1) {
-              Tp += 1
-            }
-            else {
-              Fn += 1
-              //println("instancia ", inst.toString , " ", numberSamplesPos)
-            }
+        if (a || b) {
+          if (votes == 1) {
+            Tp += 1
           }
           else {
-            if (votes==1) {
-              Fp += 1
-            } else
-              Tn += 1
+            Fn += 1
+            //println("instancia ", inst.toString , " ", numberSamplesPos)
           }
+        }
+        else {
+          if (votes==1) {
+            Fp += 1
+          } else
+            Tn += 1
+        }
 
         numberSamples += 1;
         if (votes==1)
           numberSamplesPos += 1;
 
 
-      //  if (numberSamplesPos<100)
-          learner.trainOnInstanceImpl(inst);
+        //  if (numberSamplesPos<100)
+        learner.trainOnInstanceImpl(inst);
       }
       //var res  = cmps.filter(_.filterflag == 0) //note working!!!
       var measurements= learner.getModelMeasurements()
-
-      for (i <- measurements) {
-        print("measu ", i.toString , ' ');
-      }
-      println()
-
+      labelcost=measurements(2).getValue().toInt
 
 
       clean_comparisons.result()

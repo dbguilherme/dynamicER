@@ -12,14 +12,19 @@ class InvertedIndex {
     new HashMap[String, ListBuffer[Int]]() { override def apply(key: String) = super.getOrElseUpdate(key, ListBuffer())})
   val modelIndex = Array( HashMap[Int, TokenNGrams](), HashMap[Int, TokenNGrams]())
   val ccer = Config.ccer
+  var maiorBloco = 0L
 
   def update(idx: Int, textModel: TokenNGrams, textModelTokens: List[String], storeModel: Boolean = true): Unit = {
     val (mi, ii) = getIndexesForUpdate(textModel.getDatasetId)
     for (token <- textModelTokens) {
-      ii(token) += idx
+      ii(token) += idx //Para cada bloco selecionado insere o id do registro de consulta
+      //if ( ii(token).size > maiorBloco)
+      //  maiorBloco = ii(token).size
     }
+    //println("Tamanho Indice Invertido: " + ii.size)
+    //println("Tamanho Maior Bloco: " + maiorBloco)
     if (storeModel)
-      mi(idx) = textModel
+      mi(idx) = textModel //Atualiza o textModel do registro inserido (idx)
   }
 
   // TODO guarantee correct order: e1(0) - e2(1) is a different comparison than e2(0) - e1(1)
@@ -66,13 +71,41 @@ class InvertedIndex {
     for (t <- textModelTokens ; if predicate(t)) yield (t, ii(t))
   }
 
-  def partitionedAssociatedBlocks(idx: Int, dId: Int, textModelTokens: List[String], predicate: String => Boolean, partitionPredicate: ListBuffer[Int] => Boolean) = {
+  def partitionedAssociatedBlocks(idx: Int, dId: Int, keys: List[String]) = {
+    val l, l0 = List.newBuilder[(String, ListBuffer[Int])]
+    val (mi, ii) = getIndexesForRetrieve(dId)
+    // mi = modelIndex - ii = invertedIndex
+
+    var i = 0
+    for (t <- keys)
+    {
+      i += 1
+      val block = ii(t)
+      if (block.size == 0)
+        l0.addOne((t, block)) //Insere na lista l0 de blocos com tamanho zero (associatedBlocksWithZeroSize)
+      else
+        l.addOne((t, block)) //Insere bloco em l
+      /** Block Pruning retirado **/
+    }
+    (l.result(), l0.result())
+  }
+
+  def partitionedAssociatedBlocksOriginal(idx: Int, dId: Int, keys: List[String], predicate: String => Boolean, partitionPredicate: ListBuffer[Int] => Boolean) = {
     val l, l0, r = List.newBuilder[(String, ListBuffer[Int])]
     val (mi, ii) = getIndexesForRetrieve(dId)
-    for (t <- textModelTokens ; if predicate(t)) {
+    // mi = modelIndex - ii = invertedIndex
+
+    var i = 0
+    for (t <- keys ; if predicate(t)) //Se não estiver na lista de criminalTokens (predicate)
+    {
+      i += 1
       val block = ii(t)
-      if (block.size == 0) l0.addOne((t, block))
+      if (block.size == 0)
+        l0.addOne((t, block)) //Insere na lista l0 de blocos com tamanho zero (associatedBlocksWithZeroSize)
+      //Se o tamanho do bloco+1 for menor que maxBlockSize (partitionPredicate) insere bloco em l (associatedBlocks).
+      //Se não, insere em r para remover (blocksToRemove -> criminalTokens)
       else (if (partitionPredicate(block)) l else r).addOne((t,block))
+      //else l.addOne((t,block)) /** Insere bloco. Nunca remove (BlockPruning) **/
     }
     (l.result(), l0.result(), r.result())
   }

@@ -31,8 +31,8 @@ class TokenBlockerWithBlockFiltering(size1: Int, size2: Int = 0, ro: Double = 0.
 
   def getBlocks(idx: Int, dId: Int, textModelTokens: List[String]) = {
     var (associatedBlocks, associatedBlocksWithZeroSize, blocksToRemove) = invertedIndex.
-      partitionedAssociatedBlocks(idx, dId, textModelTokens,
-        !criminalTokens.contains(_), _.size+1 < maxBlockSize(dId))
+      partitionedAssociatedBlocksOriginal(idx, dId, textModelTokens,
+        !criminalTokens.contains(_), _.size + 1 < maxBlockSize(dId))
     for ((t,b) <- blocksToRemove) {
       invertedIndex.remove(t)
       criminalTokens += t

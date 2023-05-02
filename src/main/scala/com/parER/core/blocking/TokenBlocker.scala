@@ -1,12 +1,14 @@
 package com.parER.core.blocking
 
 import com.parER.datastructure.InvertedIndex
+import gnu.trove.map.hash.TObjectIntHashMap
 import org.scify.jedai.textmodels.TokenNGrams
 
 class TokenBlocker extends Blocking {
 
   val invertedIndex = new InvertedIndex
   protected var modelStoring = true
+  val frequencyKeys = new TObjectIntHashMap[String]
 
   override def setModelStoring(value: Boolean) = {
     modelStoring = value

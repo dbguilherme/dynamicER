@@ -5,10 +5,13 @@ import org.scify.jedai.textmodels.TokenNGrams
 import org.scify.jedai.utilities.datastructures.AbstractDuplicatePropagation
 
 trait ComparisonCleaning {
-  def execute(comparisons: List[Comparison]) : List[Comparison]
-  def execute(id: Int, model: TokenNGrams, ids: List[Int]) : (Int, TokenNGrams, List[Int])
+  def execute(comparisons: List[Comparison]): List[Comparison]
 
-  def getPrecision(): (Double)
+  def execute(id: Int, model: TokenNGrams, ids: List[Int]): (Int, TokenNGrams, List[Int])
+
+
+  //function to return the variable labelcost
+  def getLabelCost(): Int
 }
 
 object ComparisonCleaning {
