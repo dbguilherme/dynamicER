@@ -8,7 +8,9 @@ class JSMatcher extends Matcher {
       comparisons
     else
       comparisons.map(cmp => {
-        cmp.sim = cmp.e1Model.getSimilarity(cmp.e2Model)
+        var a=cmp.sim
+        cmp.sim = cmp.e1Model.getSimilarity(cmp.e2Model) //bug no codigo .java Jedai, divisao de inteiros resulta em inteiro
+        cmp.sim=a
         cmp
       })
   }

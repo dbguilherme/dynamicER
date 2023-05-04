@@ -1,8 +1,8 @@
 
 import SequentialDirtyMain.labelcost
-import com.parER.core.blocking.{BlockGhosting, Blocking, CompGeneration, StoreModel}
+import com.parER.core.blocking.{Blocking, CompGeneration, StoreModel}
 import com.parER.core.collecting.ProgressiveCollector
-import com.parER.core.compcleaning.ComparisonCleaning
+import com.parER.core.compcleaning.{ComparisonCleaning, PositionalFilter}
 import com.parER.core.matching.JSMatcher
 import com.parER.core.{Config, Tokenizer}
 import com.parER.datastructure.Comparison
@@ -68,13 +68,15 @@ object SequentialDirtyMainPrefix extends App {
     val compCleaner = ComparisonCleaning.apply(Config.ccMethod,dp)
     val compMatcher = new JSMatcher
     val proCollector = new ProgressiveCollector(t0, System.currentTimeMillis(), dp, Config.print)
-    val blockGhoster = new BlockGhosting(Config.filteringRatio)
+    //val blockGhoster = new BlockGhosting(Config.filteringRatio)
     val compGeneration = new CompGeneration
 
     val storeModel = new StoreModel
+
+    val positionalFilter =new PositionalFilter
     tokenBlocker.setModelStoring(!smBool)
 
-    //val t1 = System.currentTimeMillis()
+    val t1 = System.currentTimeMillis()
 
     val csv = new CsvWriter("time")
 
@@ -94,9 +96,13 @@ object SequentialDirtyMainPrefix extends App {
         //var tFinal = 0.0D
         //var tInicial = 0L
 
-        if (i==27621) {
-            var z=1
+        if (i == 27674) {
+          //  println("string é obj1 11003: ")
+//            println("profile ", profiles1(27674).getAttributes.asScala)
+//            println("profile ", profiles1(3031).getAttributes.asScala)
+            //println(" string é cmp ", comps1(61).e2Model.getItemsFrequency.keySet())
         }
+
 
         //tInicial = System.currentTimeMillis() //Retorna um inteiro long em millesegundos
         t = System.nanoTime()
@@ -107,18 +113,32 @@ object SequentialDirtyMainPrefix extends App {
         //println("\nTokens Chaves de Blocos: " + obj1.getSignatures.size())
 
         t = System.nanoTime()
-        val tuple = tokenBlocker.processPrefix(id1, obj1)
+        val (tuple,prefix) = tokenBlocker.processPrefix(id1, obj1)
         tBlocker += (System.nanoTime() - t) * 1E-6
         tTotalRegistro += (System.nanoTime() - t) * 1E-6
         /** tuple._3 contém os blocos referente ao registro de consulta **/
         //println("Numero de Blocos Pruning: " + tuple._3.size)
         //println("Numero de Blocos Filtrados: " + tuple._3.size)
 
+
         //t = System.nanoTime()
         //val bIds = blockGhoster.process(tuple._1, tuple._2, tuple._3)
         //tBlockGhosting += (System.nanoTime() - t) * 1E-6
         //tTotalRegistro += (System.nanoTime() - t) * 1E-6
         //println("Numero de Blocos Ghosting: " + bIds._3.size)
+
+
+
+        if (i == 1000) {
+//            println("string é obj1 11003: ", obj1.getItemsFrequency.keySet())
+//            println("profile ", profiles1(27674).getAttributes.asScala)
+//            println("profile ", profiles1(3031).getAttributes.asScala)
+//            println("tuples " , (tuple._4)) //get(0).toString())
+            //println(" string é cmp ", comps1(61).e2Model.getItemsFrequency.keySet())
+            //var x = tuple._4
+            //println("tuples ", ((tuple._4)(0)._1.toString()))
+        }
+
 
         t = System.nanoTime()
         comps1 = compGeneration.generateComparisons(tuple._1, tuple._2, tuple._3) //Sem o BlockGhosting
@@ -128,16 +148,25 @@ object SequentialDirtyMainPrefix extends App {
         tTotalRegistro += (System.nanoTime() - t) * 1E-6
         //println("Pares Candidatos Gerados = " + comps1.size)
 
+
+
         /** Os blocos mantém apenas os ID's dos registros.
          * O storeModel é a etapa Flm que recupera os registros com os tokens antes da fase de comparação.
          * Para isso, o Flm mantém um mapa de perfil PM. PM serve como um índice para pesquisar um registro completo que foi determinado para exigir comparação com o registro de consulta processado atualmente.
          * */
         t = System.nanoTime()
         storeModel.solveUpdate(id1, obj1)
-        comps1 = storeModel.solveComparisons(comps1)
+        comps1 = storeModel.solveComparisons(comps1,tuple._4)
         tStoreModel += (System.nanoTime() - t) * 1E-6
         tTotalRegistro += (System.nanoTime() - t) * 1E-6
 
+
+        for (i <-comps1) {
+            i.blockingThreshold=prefix
+        }
+
+        //faz a pouda por prefixo
+        comps1=positionalFilter.execute(comps1)
 
         t = System.nanoTime()
         comps1 = compCleaner.execute(comps1)
@@ -207,49 +236,49 @@ object SequentialDirtyMainPrefix extends App {
 
     csv.writeFile(Config.file, Config.append)
 
-    //    if (Config.output) {
-    //        val csv = new CsvWriter("name,dr,bb+bp,bg,cg,cc,lm,co,cl,sum,RT,PC")
-    //        val name = dataset1+Config.cuttingRatio
-    //        val dr = tTokenizer
-    //        val bb_bp = tBlocker
-    //        val bg = tBlockGhosting
-    //        val cg = tCompGeneration
-    //        val cc = tCompCleaner
-    //        val lm = tStoreModel
-    //        val co = tMatcher
-    //        val cl = tCollector
-    //        val sum = dr+bb_bp+bg+cg+cc+lm+co+cl
-    //        val RT = (System.currentTimeMillis() - t1).toString
-    //        val PC = proCollector.getPC.toString
+//        if (true) {
+//            val csv = new CsvWriter("name,dr,bb+bp,bg,cg,cc,lm,co,cl,sum,RT,PC")
+//            val name = dataset1+Config.cuttingRatio
+//            val dr = tTokenizer
+//            val bb_bp = tBlocker
+//            val bg = tBlockGhosting
+//            val cg = tCompGeneration
+//            val cc = tCompCleaner
+//            val lm = tStoreModel
+//            val co = tMatcher
+//            val cl = tCollector
+//            val sum = dr+bb_bp+bg+cg+cc+lm+co+cl
+////            val RT = (System.currentTimeMillis() - t1).toString
+//            val PC = proCollector.getPC.toString
+//
+//            val line = List[String](name,dr.toString,bb_bp.toString,bg.toString,cg.toString,cc.toString,lm.toString,co.toString,cl.toString,sum.toString,PC)
+//    println(name)
+//    println(line)
+//            csv.newLine(line)
+//            csv.writeFile(Config.file, Config.append)
+//        }
 
-    //        val line = List[String](name,dr.toString,bb_bp.toString,bg.toString,cg.toString,cc.toString,lm.toString,co.toString,cl.toString,sum.toString,RT.toString,PC)
-    //println(name)
-    //println(line)
-    //        csv.newLine(line)
-    //        csv.writeFile(Config.file, Config.append)
-    //    }
+        if (true) {
+            val csv = new CsvWriter("name, CoCl, ro, ff, PC, PQ, BB(T), CC(T), MA(T), O(T), OD(T), BB(C), CC(C)")
 
-    //    if (Config.output) {
-    //        val csv = new CsvWriter("name, CoCl, ro, ff, PC, PQ, BB(T), CC(T), MA(T), O(T), OD(T), BB(C), CC(C)")
-    //
-    //        val CoCl = Config.ccMethod
-    //        val ro = Config.cuttingRatio.toString
-    //        val ff = Config.filteringRatio.toString
-    //        val p = if (smBool) "sm-" else ""
-    //        val name = p+CoCl + "-" + ro + "-" + ff
-    //
-    //        val PC = proCollector.getPC.toString
-    //        val PQ = proCollector.getPQ.toString
-    //        val BBT = (tTokenizer + tBlocker + tStoreModel).toString
-    //        val CCT = tCompCleaner.toString
-    //        val MAT = tMatcher.toString
-    //        val OT = (tTokenizer+tBlocker+tCompCleaner+tMatcher).toString
-    //        val ODT = (System.currentTimeMillis() - t0).toString
-    //        val BBC = cBlocker.toString
-    //        val CCC = cCompCleaner.toString
-    //
-    //        val line = List[String](name, CoCl, ro, ff, PC, PQ, BBT, CCT, MAT, OT, ODT, BBC, CCC)
-    //        csv.newLine(line)
-    //        csv.writeFile(Config.file, Config.append)
-    //    }
+            val CoCl = Config.ccMethod
+            val ro = Config.cuttingRatio.toString
+            val ff = Config.filteringRatio.toString
+            val p = if (smBool) "sm-" else ""
+            val name = p+CoCl + "-" + ro + "-" + ff
+
+            val PC = proCollector.getPC.toString
+            val PQ = proCollector.getPQ.toString
+            val BBT = (tTokenizer + tBlocker + tStoreModel).toString
+            val CCT = tCompCleaner.toString
+            val MAT = tMatcher.toString
+            val OT = (tTokenizer+tBlocker+tCompCleaner+tMatcher).toString
+            val ODT = (System.currentTimeMillis() - t0).toString
+            val BBC = cBlocker.toString
+            val CCC = cCompCleaner.toString
+
+            val line = List[String](name, CoCl, ro, ff, PC, PQ, BBT, CCT, MAT, OT, ODT, BBC, CCC)
+            csv.newLine(line)
+            csv.writeFile(Config.file, Config.append)
+        }
 }

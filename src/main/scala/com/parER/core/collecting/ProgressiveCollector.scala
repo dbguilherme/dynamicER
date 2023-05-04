@@ -40,13 +40,14 @@ class ProgressiveCollector(t0: Long, t1: Long, dp: AbstractDuplicatePropagation,
           case (_, true) => update(cmp.e2, cmp.e1)
         }
 
-      println("dup ", cmp.e2, " ", cmp.e1, "blocking  size ",cmp.blockSize, " similaridade ", cmp.sim,  " key ", cmp.blockingKey, " --" , em , " -- ", ec)
-      }
+      //println("dup ", cmp.e2, " ", cmp.e1, "blocking  size ",cmp.blockSize, " similaridade ", cmp.sim,  " key ", cmp.blockingKey," prefix ", cmp.blockingThreshold ," --" , em , " -- ", ec)// cmp.e2Model.getItemsFrequency.keySet(), " ", ec, cmp.e1Model.getItemsFrequency.keySet())
+      }//else
+        //println("nao dup ", cmp.e2, " ", cmp.e1, "blocking  size ",cmp.blockSize, " similaridade ", cmp.sim,  " key ", cmp.blockingKey," prefix ", cmp.blockingThreshold ," --" , em , " -- ", ec)// cmp.e2Model.getItemsFrequency.keySet(), " ", ec, cmp.e1Model.getItemsFrequency.keySet())
         //println()
 
     }
-//    if (printAll)
-//      print()
+    if (printAll)
+      print()
     ec += 1
   }
 

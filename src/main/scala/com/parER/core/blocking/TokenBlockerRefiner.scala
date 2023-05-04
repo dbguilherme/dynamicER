@@ -3,6 +3,7 @@ package com.parER.core.blocking
 import org.scify.jedai.textmodels.TokenNGrams
 
 import scala.collection.mutable
+import scala.util.control.Breaks._
 
 class TokenBlockerRefiner(size1: Int, size2: Int = 0, ro: Double = 0.005, ff: Double = 0.01) extends TokenBlocker {
 
@@ -91,12 +92,28 @@ class TokenBlockerRefiner(size1: Int, size2: Int = 0, ro: Double = 0.005, ff: Do
         prefix = p
       else
         prefix = 1
-    }
 
-    /** ** **/
+        prefix = 100
+    }
 
     // Ordena o map de chaves pelo valor de frequencia
     val keysOrdFreq = keysFreqRegistro.toSeq.sortBy(_._2)
+
+    //Elimita tokens com 1 entrada
+    //val keysWithMo reTokens= keysOrdFreq.filter(_._2>1)
+    if (prefix> 50) {
+      var listOfFrequency = keysOrdFreq.map(_._2).toList
+      var sum = 0
+      var cont = 0
+      while (sum < 500 && cont < listOfFrequency.size) {
+        if (listOfFrequency(cont).toInt > 1)
+          sum += listOfFrequency(cont).toInt
+        cont += 1
+      }
+      prefix=cont
+    }
+
+
 
     //Seleciona as chaves (ordenadas pela frequencia) pelo tamanho do prefixo
     val keysPrefix = keysOrdFreq.take(prefix)
@@ -117,11 +134,12 @@ class TokenBlockerRefiner(size1: Int, size2: Int = 0, ro: Double = 0.005, ff: Do
     //corta os blocos com tamanho maior que 10 TESTE
     //val xxx = associatedBlocks.filter(_._2.size<10)
     val blocks = associatedBlocks.map(a => a._2.toList)
-    val tuple = (idx, textModel, blocks,associatedBlocks)
+    val teste = associatedBlocks.map(a => a._1)
+    val tuple = (idx, textModel, blocks,teste)
     //Insere o registro de consulta nos blocos selecionados
     invertedIndex.update(idx, textModel, associatedBlocksWithZeroSize.map(e=> e._1) ++ associatedBlocks.map(e => e._1), modelStoring)
 
-    (tuple)
+    (tuple,prefix)
   }
   //Fim do process
 

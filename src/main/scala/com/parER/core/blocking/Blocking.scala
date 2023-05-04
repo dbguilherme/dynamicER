@@ -3,16 +3,14 @@ package com.parER.core.blocking
 import com.parER.datastructure.Comparison
 import org.scify.jedai.textmodels.TokenNGrams
 
-import scala.collection.mutable.ListBuffer
-
 trait Blocking {
   def execute(idx: Int, textModel: TokenNGrams) : List[Comparison]
   def execute(idx: Int, textModel: TokenNGrams, keys: List[String]) : List[Comparison]
   def setModelStoring(value: Boolean) : Unit
   def process(idx: Int, textModel: TokenNGrams) : (Int, TokenNGrams, List[List[Int]])
   def process(idx: Int, textModel: TokenNGrams, keys: List[String]) : (Int, TokenNGrams, List[List[Int]])
-  def processPrefix(idx: Int, textModel: TokenNGrams, keys: List[String]) : (Int, TokenNGrams, List[List[Int]] , List[(String, ListBuffer[Int])])
-  def processPrefix(idx: Int, textModel: TokenNGrams) : (Int, TokenNGrams, List[List[Int]] , List[(String, ListBuffer[Int])])
+  def processPrefix(idx: Int, textModel: TokenNGrams, keys: List[String]) : ((Int, TokenNGrams, List[List[Int]], List[(String)]), Int)
+  def processPrefix(idx: Int, textModel: TokenNGrams) : ((Int, TokenNGrams, List[List[Int]], List[(String)]), Int)
 }
 
 object Blocking {

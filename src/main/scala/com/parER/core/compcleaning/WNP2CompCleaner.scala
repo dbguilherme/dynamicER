@@ -75,8 +75,8 @@ class WNP2CompCleaner(dp: AbstractDuplicatePropagation) extends HSCompCleaner {
       comparisons
     else {
       var cmps = removeRedundantComparisons(comparisons)
-      val w = cmps.foldLeft(0.0)( (v, c) => v + c.sim).toDouble / cmps.size
-      cmps = cmps.filter(_.sim >= w)
+     // val w = cmps.foldLeft(0.0)( (v, c) => v + c.sim).toDouble / cmps.size
+    //  cmps = cmps.filter(_.sim >= w)
 
 
       cmps
