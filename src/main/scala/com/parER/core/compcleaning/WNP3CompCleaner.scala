@@ -49,8 +49,8 @@ class WNP3CompCleaner(dp: AbstractDuplicatePropagation) extends HSCompCleaner {
     //learner = new HoeffdingTree()
     //var learner = new HoeffdingTree;//new NaiveBayes();
     var learner = new ALUncertainty;
-    learner.budgetOption.setValue(0.1);
-    learner.activeLearningStrategyOption.setChosenIndex(1)
+    learner.budgetOption.setValue(0.3);
+    learner.activeLearningStrategyOption.setChosenIndex(0)
     learner.baseLearnerOption.setCurrentObject(new HoeffdingTree)
     //stream.prepareForUse();
 
@@ -116,7 +116,7 @@ class WNP3CompCleaner(dp: AbstractDuplicatePropagation) extends HSCompCleaner {
 
 
         inst.setValue(0,(1.0)/cmp.blockSize)
-        inst.setValue(1,cmp.sim)
+        //inst.setValue(1,cmp.sim)
         inst.setValue(2,cmp.e1Model.getItemsFrequency.size)
         inst.setValue(3,cmp.e2Model.getItemsFrequency.size)
         inst.setValue(4,sim)
@@ -155,7 +155,7 @@ class WNP3CompCleaner(dp: AbstractDuplicatePropagation) extends HSCompCleaner {
           }
           else {
             Fn += 1
-            //println("instancia ", inst.toString , " ", numberSamplesPos)
+            println("instancia ", inst.toString , " ", numberSamplesPos)
           }
         }
         else {
@@ -170,13 +170,12 @@ class WNP3CompCleaner(dp: AbstractDuplicatePropagation) extends HSCompCleaner {
           numberSamplesPos += 1;
 
 
-        //  if (numberSamplesPos<100)
+        if (numberSamplesPos<100)
         learner.trainOnInstanceImpl(inst);
       }
-      //var res  = cmps.filter(_.filterflag == 0) //note working!!!
       var measurements= learner.getModelMeasurements()
       labelcost=measurements(2).getValue().toInt
-
+      println("labeling cost ", labelcost)
 
       clean_comparisons.result()
 

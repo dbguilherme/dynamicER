@@ -265,7 +265,7 @@ object SequentialDirtyMainPrefix extends App {
             val ro = Config.cuttingRatio.toString
             val ff = Config.filteringRatio.toString
             val p = if (smBool) "sm-" else ""
-            val name = p+CoCl + "-" + ro + "-" + ff
+            val name = p+CoCl + "-" + ro + "-" + ff +  Config.dataset1 + "-" + Config.dataset2
 
             val PC = proCollector.getPC.toString
             val PQ = proCollector.getPQ.toString

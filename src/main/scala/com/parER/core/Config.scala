@@ -23,7 +23,7 @@ object Config {
   var pOption2 = 50L
   var print = true
   var blocker = "tbr"
-  var ccMethod = "wnp2"
+  var ccMethod = "wnp3"
   var matcher = "js"
   var file = ""
   var output = false

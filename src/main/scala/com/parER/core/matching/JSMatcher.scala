@@ -9,7 +9,7 @@ class JSMatcher extends Matcher {
     else
       comparisons.map(cmp => {
         var a=cmp.sim
-        cmp.sim = cmp.e1Model.getSimilarity(cmp.e2Model) //bug no codigo .java Jedai, divisao de inteiros resulta em inteiro
+        //cmp.sim = cmp.e1Model.getSimilarity(cmp.e2Model) //bug no codigo .java Jedai, divisao de inteiros resulta em inteiro
         cmp.sim=a
         cmp
       })
