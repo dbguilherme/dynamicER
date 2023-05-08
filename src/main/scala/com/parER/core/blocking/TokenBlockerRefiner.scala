@@ -92,8 +92,6 @@ class TokenBlockerRefiner(size1: Int, size2: Int = 0, ro: Double = 0.005, ff: Do
         prefix = p
       else
         prefix = 1
-
-        prefix = 100
     }
 
     // Ordena o map de chaves pelo valor de frequencia
