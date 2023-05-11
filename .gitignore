@@ -22,4 +22,18 @@
 
 *.xml
 output
-target/*
+target/*.*
+.bloop/*
+export
+out
+*.cache
+inputs
+.metals/metals.mv.db
+
+.metals/
+
+project/
+
+src/main/scala/target/streams/
+
+target/
