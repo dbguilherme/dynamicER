@@ -17,11 +17,18 @@ class CsvWriter(header: String) {
   }
 
   def writeFile(filename: String, append: Boolean): Unit = {
-    val file = new File(filename)
-    val bw = new BufferedWriter(new FileWriter(file, append))
-    if (!append) {
+    var flag=false
+    val file=new File(filename)
+    if (!file.exists()){
+      flag=true
+    }
+    var bw = new BufferedWriter(new FileWriter(file, append))
+    if (flag){
       bw.write(header)
       bw.newLine()
+    }
+    if (!append) {
+
     }
     for (line <- buffer) {
       bw.write(line)

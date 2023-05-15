@@ -1,15 +1,14 @@
-import SequentialDirtyMain.{dp, eFile1, gtFile, profiles1, smBool, t0}
 import com.parER.core.blocking.{BlockGhosting, Blocking, CompGeneration, StoreModel}
 import com.parER.core.collecting.ProgressiveCollector
 import com.parER.core.compcleaning.ComparisonCleaning
-import com.parER.core.matching.{JSMatcher, Matcher}
+import com.parER.core.matching.JSMatcher
 import com.parER.core.{Config, Tokenizer}
 import com.parER.datastructure.Comparison
 import com.parER.utils.CsvWriter
 import org.scify.jedai.datamodel.EntityProfile
 import org.scify.jedai.datareader.entityreader.EntitySerializationReader
 import org.scify.jedai.datareader.groundtruthreader.GtSerializationReader
-import org.scify.jedai.utilities.datastructures.{BilateralDuplicatePropagation, UnilateralDuplicatePropagation}
+import org.scify.jedai.utilities.datastructures.UnilateralDuplicatePropagation
 
 object SequentialFixedIncrementalDirtyMain extends App {
     import scala.jdk.CollectionConverters._
@@ -64,7 +63,7 @@ object SequentialFixedIncrementalDirtyMain extends App {
     // STEP 2. functional stages
     val tokenizer = new Tokenizer
     val tokenBlocker = Blocking.apply(Config.blocker, profiles1.size, 0, Config.cuttingRatio, Config.filteringRatio)
-    val compCleaner = ComparisonCleaning.apply(Config.ccMethod,dp)
+    val compCleaner = ComparisonCleaning.apply(Config.ccMethod,Config.supervisedApproach,dp)
     val compMatcher = new JSMatcher
     val proCollector = new ProgressiveCollector(t0, System.currentTimeMillis(), dp, Config.print)
     val blockGhoster = new BlockGhosting(Config.filteringRatio)

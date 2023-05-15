@@ -3,7 +3,7 @@ package com.parER.core.compcleaning
 import com.parER.datastructure.Comparison
 import com.yahoo.labs.samoa.instances._
 import moa.classifiers.AbstractClassifier
-import moa.classifiers.active.ALUncertainty
+import moa.classifiers.bayes.NaiveBayes
 import moa.classifiers.trees.HoeffdingTree
 import moa.core.{TimingUtils, Utils}
 import org.scify.jedai.datamodel.IdDuplicates
@@ -13,7 +13,7 @@ import org.scify.jedai.utilities.datastructures.AbstractDuplicatePropagation
 import java.util
 import java.util.Random
 
-class WNP3CompCleaner(dp: AbstractDuplicatePropagation) extends HSCompCleaner {
+class WNP3CompCleaner(dp: AbstractDuplicatePropagation, supervisedApproach: Int) extends HSCompCleaner {
 
 
 
@@ -48,10 +48,22 @@ class WNP3CompCleaner(dp: AbstractDuplicatePropagation) extends HSCompCleaner {
   private def createClassifier() = {
     //learner = new HoeffdingTree()
     //var learner = new HoeffdingTree;//new NaiveBayes();
-    var learner = new ALUncertainty;
-    learner.budgetOption.setValue(0.3);
-    learner.activeLearningStrategyOption.setChosenIndex(0)
-    learner.baseLearnerOption.setCurrentObject(new HoeffdingTree)
+    var learner=new NaiveBayes;
+    if (supervisedApproach==0){
+      println ("------------NaiveBayes-----------------")
+      var learner = new NaiveBayes;
+    }else if(supervisedApproach==1){
+      println ("------------hoeffding -----------------")
+      var learner = new HoeffdingTree;
+    }else if (supervisedApproach==2){
+
+    }
+
+
+   // if (config.)
+//    learner.budgetOption.setValue(0.3);
+//    learner.activeLearningStrategyOption.setChosenIndex(0)
+//    learner.baseLearnerOption.setCurrentObject(new HoeffdingTree)
     //stream.prepareForUse();
 
     //    learner.removePoorAttsOption.setValue(true);
@@ -155,7 +167,7 @@ class WNP3CompCleaner(dp: AbstractDuplicatePropagation) extends HSCompCleaner {
           }
           else {
             Fn += 1
-            println("instancia ", inst.toString , " ", numberSamplesPos)
+            //println("instancia ", inst.toString , " ", numberSamplesPos)
           }
         }
         else {
@@ -173,9 +185,9 @@ class WNP3CompCleaner(dp: AbstractDuplicatePropagation) extends HSCompCleaner {
         if (numberSamplesPos<100)
         learner.trainOnInstanceImpl(inst);
       }
-      var measurements= learner.getModelMeasurements()
-      labelcost=measurements(2).getValue().toInt
-      println("labeling cost ", labelcost)
+  //    var measurements= learner.getModelMeasurements()
+//      labelcost=measurements(2).getValue().toInt
+      //println("labeling cost ", labelcost)
 
       clean_comparisons.result()
 

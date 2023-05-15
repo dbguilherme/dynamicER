@@ -6,7 +6,6 @@ import com.parER.core.matching.Matcher
 import com.parER.core.{Config, Tokenizer}
 import com.parER.datastructure.Comparison
 import com.parER.utils.CsvWriter
-import org.scify.jedai.datamodel.EntityProfile
 import org.scify.jedai.datareader.entityreader.EntitySerializationReader
 import org.scify.jedai.datareader.groundtruthreader.GtSerializationReader
 import org.scify.jedai.textmodels.TokenNGrams
@@ -71,7 +70,7 @@ object SequentialCCMainRefactoredRandom extends App {
     // STEP 2. functional stages
     val tokenizer = new Tokenizer
     val tokenBlocker = Blocking.apply(Config.blocker, profiles1.size, profiles2.size, Config.cuttingRatio, Config.filteringRatio)
-    val compCleaner = ComparisonCleaning.apply(Config.ccMethod,dp)
+    val compCleaner = ComparisonCleaning.apply(Config.ccMethod,Config.supervisedApproach,dp)
     val compMatcher = Matcher.apply(Config.matcher)
     val proCollector = new ProgressiveCollector(t0, System.currentTimeMillis(), dp, Config.print)
 

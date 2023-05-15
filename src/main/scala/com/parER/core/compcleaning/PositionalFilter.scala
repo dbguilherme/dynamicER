@@ -21,6 +21,8 @@ class PositionalFilter extends ComparisonCleaning{
   }
 
   override def execute(comparisons: List[Comparison]): List[Comparison] = {
+   // print( "before positional ", comparisons.size)
+
     if (comparisons.size == 0)
       comparisons
     else {
@@ -33,18 +35,14 @@ class PositionalFilter extends ComparisonCleaning{
             count+=1
           }
         }
-        if (count>=2)//(c.blockingThreshold/4))  //Limiar é o tamanho do prefixo /2
-        {
-          clean_comparisons.addOne(c)
-          numero+=1
-        }
-      }
-      //var cmps = filter(comparisons)
-      // val w = cmps.foldLeft(0.0)( (v, c) => v + c.sim).toDouble / cmps.size
-      //  cmps = cmps.filter(_.sim >= w)
+        var prefixThreshold=2
+        if (count>=prefixThreshold)//(c.blockingThreshold/4))  //Limiar é o tamanho do prefixo /2
+           clean_comparisons.addOne(c)
 
+      }
 
       clean_comparisons.result()
+
 
     }
   }

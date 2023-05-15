@@ -65,7 +65,7 @@ object SequentialDirtyMainPrefix extends App {
     /** STEP 2. functional stages **/
     val tokenizer = new Tokenizer
     val tokenBlocker = Blocking.apply(Config.blocker, profiles1.size, 0, Config.cuttingRatio, Config.filteringRatio)
-    val compCleaner = ComparisonCleaning.apply(Config.ccMethod,dp)
+    val compCleaner = ComparisonCleaning.apply(Config.ccMethod,Config.supervisedApproach,dp)
     val compMatcher = new JSMatcher
     val proCollector = new ProgressiveCollector(t0, System.currentTimeMillis(), dp, Config.print)
     //val blockGhoster = new BlockGhosting(Config.filteringRatio)
@@ -129,15 +129,7 @@ object SequentialDirtyMainPrefix extends App {
 
 
 
-        if (i == 1000) {
-//            println("string é obj1 11003: ", obj1.getItemsFrequency.keySet())
-//            println("profile ", profiles1(27674).getAttributes.asScala)
-//            println("profile ", profiles1(3031).getAttributes.asScala)
-//            println("tuples " , (tuple._4)) //get(0).toString())
-            //println(" string é cmp ", comps1(61).e2Model.getItemsFrequency.keySet())
-            //var x = tuple._4
-            //println("tuples ", ((tuple._4)(0)._1.toString()))
-        }
+
 
 
         t = System.nanoTime()
@@ -146,7 +138,7 @@ object SequentialDirtyMainPrefix extends App {
         cBlocker += comps1.size
         tCompGeneration += (System.nanoTime() - t) * 1E-6
         tTotalRegistro += (System.nanoTime() - t) * 1E-6
-        //println("Pares Candidatos Gerados = " + comps1.size)
+       // println("Pares Candidatos Gerados = " + comps1.size)
 
 
 
@@ -234,7 +226,7 @@ object SequentialDirtyMainPrefix extends App {
     println("PC = " + proCollector.getPC)
     println("PQ = " + proCollector.getPQ + "\n")
 
-    csv.writeFile(Config.file, Config.append)
+   // csv.writeFile(Config.file, Config.append)
 
 //        if (true) {
 //            val csv = new CsvWriter("name,dr,bb+bp,bg,cg,cc,lm,co,cl,sum,RT,PC")
@@ -267,8 +259,8 @@ object SequentialDirtyMainPrefix extends App {
             val p = if (smBool) "sm-" else ""
             val name = p+CoCl + "-" + ro + "-" + ff +  Config.dataset1 + "-" + Config.dataset2
 
-            val PC = proCollector.getPC.toString
-            val PQ = proCollector.getPQ.toString
+            val PC = (proCollector.getPC).toString
+            val PQ = (proCollector.getPQ*1000).toString
             val BBT = (tTokenizer + tBlocker + tStoreModel).toString
             val CCT = tCompCleaner.toString
             val MAT = tMatcher.toString
@@ -277,8 +269,9 @@ object SequentialDirtyMainPrefix extends App {
             val BBC = cBlocker.toString
             val CCC = cCompCleaner.toString
 
-            val line = List[String](name, CoCl, ro, ff, PC, PQ, BBT, CCT, MAT, OT, ODT, BBC, CCC)
+            val line = List[String](name, CoCl, "PC", PC,"PQ", PQ, "BBC ", BBC, "CCC ", CCC, "BBT", BBT, "CCT", CCT, "MAT", MAT, "OT", OT, "ODT", ODT)
             csv.newLine(line)
             csv.writeFile(Config.file, Config.append)
+
         }
 }

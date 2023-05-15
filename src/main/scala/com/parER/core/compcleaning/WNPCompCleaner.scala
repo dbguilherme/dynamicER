@@ -4,7 +4,7 @@ import com.parER.datastructure.Comparison
 import org.scify.jedai.textmodels.TokenNGrams
 import org.scify.jedai.utilities.datastructures.AbstractDuplicatePropagation
 
-class WNPCompCleaner(dp: AbstractDuplicatePropagation) extends HSCompCleaner {
+class WNPCompCleaner(dp: AbstractDuplicatePropagation, id:Int) extends HSCompCleaner {
 
   override def execute(comparisons: List[Comparison]) = {
     if (comparisons.size == 0)

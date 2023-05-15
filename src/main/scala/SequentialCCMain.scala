@@ -1,5 +1,4 @@
 
-import SequentialDirtyMain.proCollector
 import com.parER.core.blocking.{BlockGhosting, Blocking, CompGeneration, StoreModel}
 import com.parER.core.collecting.ProgressiveCollector
 import com.parER.core.compcleaning.ComparisonCleaning
@@ -68,7 +67,7 @@ object SequentialCCMain extends App {
     // STEP 2. functional stages
     val tokenizer = new Tokenizer
     val tokenBlocker = Blocking.apply(Config.blocker, profiles1.size, profiles2.size, Config.cuttingRatio, Config.filteringRatio)
-    val compCleaner = ComparisonCleaning.apply(Config.ccMethod,dp)
+    val compCleaner = ComparisonCleaning.apply(Config.ccMethod,Config.supervisedApproach,dp)
     val compMatcher = Matcher.apply(Config.matcher)
     val proCollector = new ProgressiveCollector(t0, System.currentTimeMillis(), dp, Config.print)
 

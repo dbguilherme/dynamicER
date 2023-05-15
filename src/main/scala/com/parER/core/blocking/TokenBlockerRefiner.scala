@@ -10,7 +10,7 @@ class TokenBlockerRefiner(size1: Int, size2: Int = 0, ro: Double = 0.005, ff: Do
   // Tokens to blacklist
   val criminalTokens = mutable.HashSet[String]()
   val maxBlockSize = Array(ro*size1, ro*size2)
-
+  var threshold =0.9
   //println("ro: " + ro + "   ff: " + ff)
   println(s"TokenBlockerRefiner mbs1=${maxBlockSize(0)} ;; mbs2=${maxBlockSize(1)}")
   //System.in.read()
@@ -71,10 +71,7 @@ class TokenBlockerRefiner(size1: Int, size2: Int = 0, ro: Double = 0.005, ff: Do
       //Guarda as chaves dos registros com sua frequencia atual
       keysFreqRegistro += (key -> frequencyKeys.get(key).intValue)
     }
-    if (idx == 27621)
-      print("teste ")
-    //println("\nFrequencia das Chaves:\n" + frequencyKeys.toString)
-    //System.in.read()
+
 
     /** COMO CALCULAR O PREFIXO (prefix) DO REGISTRO???
      * ACHAR NUMERO DE REGISTROS (n) DE ENTRADA QUE FUNCIONE BEM
@@ -86,35 +83,51 @@ class TokenBlockerRefiner(size1: Int, size2: Int = 0, ro: Double = 0.005, ff: Do
       prefix = keysFreqRegistro.size
     else
     {
-      val p = (keysFreqRegistro.size / 2).toInt
+      val p = (keysFreqRegistro.size * threshold).toInt
       //val p=5
       if(p >= 1)
         prefix = p
       else
         prefix = 1
     }
+    if (idx%20000==0) {
+     // threshold-=0.1
+
+    }
+    //println("idx: " + idx + "   threshold: " + prefix + "   keysFreqRegistro.size: " + keysFreqRegistro.size)
 
     // Ordena o map de chaves pelo valor de frequencia
     val keysOrdFreq = keysFreqRegistro.toSeq.sortBy(_._2)
 
-    //Elimita tokens com 1 entrada
-    //val keysWithMo reTokens= keysOrdFreq.filter(_._2>1)
-    if (prefix> 50) {
-      var listOfFrequency = keysOrdFreq.map(_._2).toList
-      var sum = 0
-      var cont = 0
-      while (sum < 500 && cont < listOfFrequency.size) {
-        if (listOfFrequency(cont).toInt > 1)
-          sum += listOfFrequency(cont).toInt
-        cont += 1
-      }
-      prefix=cont
-    }
+
+//    Elimita tokens com 1 entrada
+//    val keysWithMo reTokens= keysOrdFreq.filter(_._2>1)
+//    if (prefix> 50) {
+//      var listOfFrequency = keysOrdFreq.map(_._2).toList
+//      var sum = 0
+//      var cont = 0
+//      while (sum < 500 && cont < listOfFrequency.size) {
+//        if (listOfFrequency(cont).toInt > 1)
+//          sum += listOfFrequency(cont).toInt
+//        cont += 1
+//      }
+//      prefix=cont
+//    }
+
 
 
 
     //Seleciona as chaves (ordenadas pela frequencia) pelo tamanho do prefixo
-    val keysPrefix = keysOrdFreq.take(prefix)
+    var keysPrefix = keysOrdFreq.take(prefix)
+    //produce the sum of the keysPrefix list (sum of the frequencies)
+
+
+    while (keysPrefix.filter(_._2 > 1).size == 0 && prefix<keysOrdFreq.size) {
+         prefix+=1
+         keysPrefix = keysOrdFreq.take(prefix)
+    }
+
+
 
     //Coloca todas as chaves em uma lista de Strings (sem a frequencia)
     val keysFinal = keysPrefix.map(_._1).toList
@@ -134,8 +147,12 @@ class TokenBlockerRefiner(size1: Int, size2: Int = 0, ro: Double = 0.005, ff: Do
     val blocks = associatedBlocks.map(a => a._2.toList)
     val teste = associatedBlocks.map(a => a._1)
     val tuple = (idx, textModel, blocks,teste)
+
     //Insere o registro de consulta nos blocos selecionados
     invertedIndex.update(idx, textModel, associatedBlocksWithZeroSize.map(e=> e._1) ++ associatedBlocks.map(e => e._1), modelStoring)
+
+    //sum the values of the blocks variable
+    //print("block sum of values ", blocks.flatten.size)
 
     (tuple,prefix)
   }

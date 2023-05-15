@@ -9,7 +9,7 @@ import org.scify.jedai.utilities.datastructures.AbstractDuplicatePropagation
 import java.util
 
 
-class WNP2CompCleaner(dp: AbstractDuplicatePropagation) extends HSCompCleaner {
+class WNP2CompCleaner(dp: AbstractDuplicatePropagation, id:Int) extends HSCompCleaner {
 
 
 

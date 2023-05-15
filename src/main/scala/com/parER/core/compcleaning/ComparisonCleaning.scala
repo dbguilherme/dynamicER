@@ -9,18 +9,17 @@ trait ComparisonCleaning {
 
   def execute(id: Int, model: TokenNGrams, ids: List[Int]): (Int, TokenNGrams, List[Int])
 
-
   //function to return the variable labelcost
   def getLabelCost(): Int
 }
 
 object ComparisonCleaning {
-  def apply(name: String, dp: AbstractDuplicatePropagation) = name match {
+  def apply(name: String, supervisedApproach: Int, dp: AbstractDuplicatePropagation) = name match {
     //case "hs" => new HSCompCleaner(dp)
-    case "wnp" => new WNPCompCleaner(dp)
-    case "wnp2" => new WNP2CompCleaner(dp)
-    case "wnp3" => new WNP3CompCleaner(dp)
-    case "cnp" => new CNPCompCleaner(dp)
+    case "wnp" => new WNPCompCleaner(dp,supervisedApproach)
+    case "wnp2" => new WNP2CompCleaner(dp,supervisedApproach)
+    case "wnp3" => new WNP3CompCleaner(dp,supervisedApproach)
+    case "cnp" => new CNPCompCleaner(dp,supervisedApproach)
   }
 
 
