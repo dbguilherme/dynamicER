@@ -33,7 +33,7 @@ object Config {
   var batches = 1
   var print2 = true //true para imprimir estatisticas das bases de dados
 
-  var supervisedApproach=1
+  var supervisedApproach=0
 
   var filling = false
 
@@ -90,7 +90,7 @@ object Config {
       case Array("-o", arg: String) => { Config.output = true ; Config.file = arg}
       case Array("-a", arg: String) => Config.append = arg.toInt != 0
       case Array("-sm", arg: String) => Config.storeModel = arg.toInt != 0
-      case Array("-su", arg: String) => Config.batches = arg.toInt
+      case Array("-su", arg: String) => Config.supervisedApproach = arg.toInt
     }
   }
 
