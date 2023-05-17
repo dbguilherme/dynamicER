@@ -65,7 +65,7 @@ object SequentialDirtyMainPrefix extends App {
     /** STEP 2. functional stages **/
     val tokenizer = new Tokenizer
     val tokenBlocker = Blocking.apply(Config.blocker, profiles1.size, 0, Config.cuttingRatio, Config.filteringRatio)
-    val compCleaner = ComparisonCleaning.apply(Config.ccMethod,Config.supervisedApproach,dp)
+    val compCleaner = ComparisonCleaning.apply(Config.ccMethod,Config.supervisedApproach,dp, Config.thSupervised)
     val compMatcher = new JSMatcher
     val proCollector = new ProgressiveCollector(t0, System.currentTimeMillis(), dp, Config.print)
     //val blockGhoster = new BlockGhosting(Config.filteringRatio)
@@ -183,12 +183,12 @@ object SequentialDirtyMainPrefix extends App {
         //tFinal = (System.currentTimeMillis() - tInicial)
         //  println("Duplicatas Totais = " + proCollector.getCardinaliy)
         // println("PC = " + (proCollector.getPC()))
-        duplisTotal = proCollector.getCardinaliy
+        //duplisTotal = proCollector.getCardinaliy
 
         //println("\nTempo Mili = " + tFinal + " ms"  + "\n")
         //println("Tempo = " + tTotalRegistro + " ms"  + "\n")
 
-        val line = List[String](tTotalRegistro.toString.replace('.' , ','))
+        //val line = List[String](tTotalRegistro.toString.replace('.' , ','))
         //csv.newLine(line)
 //        if (i%1000==0) {
 //            println("Registro " + i + " de " + proCollector.getPC())

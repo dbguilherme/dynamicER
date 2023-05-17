@@ -4,7 +4,7 @@ import com.parER.datastructure.Comparison
 import com.yahoo.labs.samoa.instances._
 import moa.classifiers.AbstractClassifier
 import moa.classifiers.bayes.NaiveBayes
-import moa.classifiers.trees.HoeffdingTree
+import moa.classifiers.trees.{AdaHoeffdingOptionTree, HoeffdingOptionTree}
 import moa.core.{TimingUtils, Utils}
 import org.scify.jedai.datamodel.IdDuplicates
 import org.scify.jedai.textmodels.TokenNGrams
@@ -13,7 +13,7 @@ import org.scify.jedai.utilities.datastructures.AbstractDuplicatePropagation
 import java.util
 import java.util.Random
 
-class WNP3CompCleaner(dp: AbstractDuplicatePropagation, supervisedApproach: Int) extends HSCompCleaner {
+class WNP3CompCleaner(dp: AbstractDuplicatePropagation, supervisedApproach: Int, thSupervised:Double) extends HSCompCleaner {
 
 
 
@@ -43,23 +43,42 @@ class WNP3CompCleaner(dp: AbstractDuplicatePropagation, supervisedApproach: Int)
   }
 
 
+  def getClassifier(id: Int): AbstractClassifier = {
 
+    val learner =id match {
+      case 0 =>{ println("------------NaiveBayes-----------------") ; var l=new NaiveBayes; l      }
+      case 1 =>{       println("------------HoeffdingOptionTree -----------------", thSupervised, ""); var l=     new HoeffdingOptionTree; l.noPrePruneOption; l   }
+      case 2 =>{       println("------------AdaHoeffdingOptionTree -----------------", thSupervised, "");         new AdaHoeffdingOptionTree      }
+      case 3 =>{       println("------------AdaHoeffdingOptionTree -----------------", thSupervised, "");         new AdaHoeffdingOptionTree      }
+    }
+//    if (supervisedApproach == 0) {
+//      println("------------NaiveBayes-----------------")
+//      var learner = new NaiveBayes;
+//    } else if (supervisedApproach == 1) {
+//      var i:Int=100
+//      println("------------HoeffdingOptionTree -----------------", thSupervised, "")
+//      var learner = new HoeffdingOptionTree;
+//      learner.gracePeriodOption.setValue(thSupervised.toInt);
+//    } else if (supervisedApproach == 2) {
+//      println("------------AdaHoeffdingOptionTree -----------------", thSupervised, "")
+//      var learner = new AdaHoeffdingOptionTree;
+//    } else if (supervisedApproach == 3) {
+//      println("------------AdaHoeffdingOptionTree -----------------", thSupervised, "")
+//      var learner = new AdaHoeffdingOptionTree;
+//    }
+//    println(i)
+    learner
+
+  }
 
   private def createClassifier() = {
     //learner = new HoeffdingTree()
     //var learner = new HoeffdingTree;//new NaiveBayes();
-    var learner=new NaiveBayes;
-    if (supervisedApproach==0){
-      println ("------------NaiveBayes-----------------")
-      var learner = new NaiveBayes;
-    }else if(supervisedApproach==1){
-      println ("------------hoeffding -----------------")
-      var learner = new HoeffdingTree;
-    }else if (supervisedApproach==2){
-
-    }
+    //var learner=new NaiveBayes;
+    var learner = getClassifier(supervisedApproach)
 
 
+    println("learner is ", learner.getModel.toString)
    // if (config.)
 //    learner.budgetOption.setValue(0.3);
 //    learner.activeLearningStrategyOption.setChosenIndex(0)
@@ -182,7 +201,7 @@ class WNP3CompCleaner(dp: AbstractDuplicatePropagation, supervisedApproach: Int)
           numberSamplesPos += 1;
 
 
-        if (numberSamplesPos<100)
+        if (numberSamplesPos<10)
         learner.trainOnInstanceImpl(inst);
       }
   //    var measurements= learner.getModelMeasurements()

@@ -32,7 +32,7 @@ object Config {
   var storeModel = true
   var batches = 1
   var print2 = true //true para imprimir estatisticas das bases de dados
-
+  var thSupervised=0.0
   var supervisedApproach=0
 
   var filling = false
@@ -67,6 +67,7 @@ object Config {
       case Array("--append", arg: String) => Config.append = arg.toInt != 0
       case Array("--storemodel", arg: String) => Config.storeModel = arg.toInt != 0
       case Array("--batches", arg: String) => Config.batches = arg.toInt
+      case Array("--thSupervised", arg: String) => Config.thSupervised = arg.toDouble
 
       // short options
       case Array("-nw", arg: String) => Config.workers = arg.toInt
@@ -91,6 +92,7 @@ object Config {
       case Array("-a", arg: String) => Config.append = arg.toInt != 0
       case Array("-sm", arg: String) => Config.storeModel = arg.toInt != 0
       case Array("-su", arg: String) => Config.supervisedApproach = arg.toInt
+      case Array("-th", arg: String) => Config.thSupervised = arg.toDouble
     }
   }
 
