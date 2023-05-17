@@ -45,7 +45,7 @@ class WNP3CompCleaner(dp: AbstractDuplicatePropagation, supervisedApproach: Int,
 
   def getClassifier(id: Int): AbstractClassifier = {
 
-    val learner =id match {
+    val learner =id match {  
       case 0 =>{ println("------------NaiveBayes-----------------") ; var l=new NaiveBayes; l      }
       case 1 =>{       println("------------HoeffdingOptionTree -----------------", thSupervised, ""); var l=     new HoeffdingOptionTree; l.noPrePruneOption; l   }
       case 2 =>{       println("------------AdaHoeffdingOptionTree -----------------", thSupervised, "");         new AdaHoeffdingOptionTree      }
