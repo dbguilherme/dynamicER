@@ -21,6 +21,6 @@ object ComparisonCleaning {
     case "wnp3" => new WNP3CompCleaner(dp,supervisedApproach, thSupervised)
     case "cnp" => new CNPCompCleaner(dp,supervisedApproach)
   }
-   
+
 
 }

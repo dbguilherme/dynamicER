@@ -60,8 +60,7 @@ object SequentialDirtyMainPrefix extends App {
     val gtReader = new GtSerializationReader(gtFile)
     val dp = new UnilateralDuplicatePropagation(gtReader.getDuplicatePairs(null))
     if (Config.print2) System.out.println("Existing Duplicates\t:\t" + dp.getDuplicates.size)
-    //System.in.read()
-    println("Config.supervisedApproach  ----",Config.supervisedApproach)
+
     /** STEP 2. functional stages **/
     val tokenizer = new Tokenizer
     val tokenBlocker = Blocking.apply(Config.blocker, profiles1.size, 0, Config.cuttingRatio, Config.filteringRatio)
