@@ -39,11 +39,11 @@ class ProgressiveCollector(t0: Long, t1: Long, dp: AbstractDuplicatePropagation,
           case (true, _) => update(cmp.e1, cmp.e2)
           case (_, true) => update(cmp.e2, cmp.e1)
         }
-      if (cmp.blockingKey>7) {
-        println("dup ", cmp.e2, " ", cmp.e1, "blocking  size ",cmp.blockSize, " similaridade ", cmp.sim,  " key ", cmp.blockingKey," prefix ", cmp.blockingThreshold ," --" , em , " -- ", ec)// cmp.e2Model.getItemsFrequency.keySet(), " ", ec, cmp.e1Model.getItemsFrequency.keySet())
-        println(" cmp.e ", cmp.e1Model.getItemsFrequency.keySet())
-        println(" cmp.e ", cmp.e2Model.getItemsFrequency.keySet())
-      }
+//      if (cmp.blockingKey>7) {
+//        println("dup ", cmp.e2, " ", cmp.e1, "blocking  size ",cmp.blockSize, " similaridade ", cmp.sim,  " key ", cmp.blockingKey," prefix ", cmp.blockingThreshold ," --" , em , " -- ", ec)// cmp.e2Model.getItemsFrequency.keySet(), " ", ec, cmp.e1Model.getItemsFrequency.keySet())
+//        println(" cmp.e ", cmp.e1Model.getItemsFrequency.keySet())
+//        println(" cmp.e ", cmp.e2Model.getItemsFrequency.keySet())
+//      }
       }//else
         //println("nao dup ", cmp.e2, " ", cmp.e1, "blocking  size ",cmp.blockSize, " similaridade ", cmp.sim,  " key ", cmp.blockingKey," prefix ", cmp.blockingThreshold ," --" , em , " -- ", ec)// cmp.e2Model.getItemsFrequency.keySet(), " ", ec, cmp.e1Model.getItemsFrequency.keySet())
         //println()

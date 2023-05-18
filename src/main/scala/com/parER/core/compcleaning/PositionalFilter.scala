@@ -38,7 +38,6 @@ class PositionalFilter extends ComparisonCleaning{
         var prefixThreshold=2
         if (count>=prefixThreshold)//(c.blockingThreshold/4))  //Limiar é o tamanho do prefixo /2
            clean_comparisons.addOne(c)
-
       }
 
       clean_comparisons.result()

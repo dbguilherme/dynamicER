@@ -14,8 +14,6 @@ import org.scify.jedai.utilities.datastructures.UnilateralDuplicatePropagation
 object SequentialDirtyMainPrefix extends App {
     import scala.jdk.CollectionConverters._
 
-    //System.in.read() //Método de parada para análise
-
     val maxMemory = Runtime.getRuntime().maxMemory()  / math.pow(10, 6)
 
     /**  Time variables **/
@@ -40,7 +38,7 @@ object SequentialDirtyMainPrefix extends App {
     val threshold = Config.threshold
     val smBool = Config.storeModel
 
-    println(s"Store model ${smBool}")
+    //println(s"Store model ${smBool}")
 
     /** STEP 1. Initialization and read dataset - gt file **/
     val t0 = System.currentTimeMillis()
@@ -58,15 +56,17 @@ object SequentialDirtyMainPrefix extends App {
     if (Config.print2) System.out.println("Input Entity Profiles1\t:\t" + profiles1.size)
 
     val gtReader = new GtSerializationReader(gtFile)
-    val dp = new UnilateralDuplicatePropagation(gtReader.getDuplicatePairs(null))
-    if (Config.print2) System.out.println("Existing Duplicates\t:\t" + dp.getDuplicates.size)
+    val dpA = new UnilateralDuplicatePropagation(gtReader.getDuplicatePairs(null))
+    val dpB = new UnilateralDuplicatePropagation(gtReader.getDuplicatePairs(null))
+    if (Config.print2) System.out.println("Existing Duplicates\t:\t" + dpA.getDuplicates.size)
 
-    /** STEP 2. functional stages **/
+      /** STEP 2. functional stages **/
     val tokenizer = new Tokenizer
     val tokenBlocker = Blocking.apply(Config.blocker, profiles1.size, 0, Config.cuttingRatio, Config.filteringRatio)
-    val compCleaner = ComparisonCleaning.apply(Config.ccMethod,Config.supervisedApproach,dp, Config.thSupervised)
+    val compCleaner = ComparisonCleaning.apply(Config.ccMethod,Config.supervisedApproach,dpA, Config.thSupervised)
     val compMatcher = new JSMatcher
-    val proCollector = new ProgressiveCollector(t0, System.currentTimeMillis(), dp, Config.print)
+    val proCollectorA = new ProgressiveCollector(t0, System.currentTimeMillis(), dpA, Config.print)
+    val proCollectorB = new ProgressiveCollector(t0, System.currentTimeMillis(), dpB, Config.print)
     //val blockGhoster = new BlockGhosting(Config.filteringRatio)
     val compGeneration = new CompGeneration
 
@@ -86,14 +86,11 @@ object SequentialDirtyMainPrefix extends App {
     println("\n*** Registros = " + n + "\n")
     while (i < n)
     {
-        //println("------------------------------\nRegistro " + (i+1))
-        //println("Registro: " + profiles1(i))
 
         var comps1 = List[Comparison]()
         var t = 0L
         var tTotalRegistro = 0.0D
-        //var tFinal = 0.0D
-        //var tInicial = 0L
+
 
         if (i == 27674) {
           //  println("string é obj1 11003: ")
@@ -127,10 +124,6 @@ object SequentialDirtyMainPrefix extends App {
         //println("Numero de Blocos Ghosting: " + bIds._3.size)
 
 
-
-
-
-
         t = System.nanoTime()
         comps1 = compGeneration.generateComparisons(tuple._1, tuple._2, tuple._3) //Sem o BlockGhosting
         //comps1 = compGeneration.generateComparisons(bIds._1, bIds._2, bIds._3)  //Com o BlockGhosting
@@ -160,6 +153,14 @@ object SequentialDirtyMainPrefix extends App {
         comps1=positionalFilter.execute(comps1)
 
         t = System.nanoTime()
+        if (comps1.size != 0)
+            comps1=compCleaner.removeRedundantComparisons(comps1)
+
+        proCollectorA.execute(comps1)
+//        tCollector += (System.nanoTime() - t) * 1E-6
+//        tTotalRegistro += (System.nanoTime() - t) * 1E-6
+
+        t = System.nanoTime()
         comps1 = compCleaner.execute(comps1)
         cCompCleaner += comps1.size
         tCompCleaner += (System.nanoTime() - t) * 1E-6
@@ -176,7 +177,7 @@ object SequentialDirtyMainPrefix extends App {
         tTotalRegistro += (System.nanoTime() - t) * 1E-6
 
         t = System.nanoTime()
-        proCollector.execute(comps1)
+        proCollectorB.execute(comps1)
         tCollector += (System.nanoTime() - t) * 1E-6
         tTotalRegistro += (System.nanoTime() - t) * 1E-6
         //tFinal = (System.currentTimeMillis() - tInicial)
@@ -218,13 +219,16 @@ object SequentialDirtyMainPrefix extends App {
 
     println("Tempo medio registro = " + tempoTotal / i + " ms")
     println("Tempo total = " + tempoTotal + " ms") //Tempo sem impressão
-    println("Duplicatas encontradas = " + proCollector.em.toInt)
-    println("Duplicatas existentes = " + proCollector.duplicates.size)
+    println("Duplicatas encontradas apos filtro posição = " + proCollectorA.em.toInt)
+    println("Duplicatas existentes  apos filtro posição = " + proCollectorA.ec.toInt)
+    println("Duplicatas encontradas apos super = " + proCollectorB.em.toInt)
+    println("Duplicatas existentes  apos super = " + proCollectorB.ec.toInt)
     println("Pares candidatos blocking: " + cBlocker)
     println("Pares candidatos comparison cleaning: " + cCompCleaner)
-    println("PC = " + proCollector.getPC)
-    println("PQ = " + proCollector.getPQ + "\n")
-
+    println("PC after filtering = " + proCollectorA.getPC)
+    println("PQ after filtering = " + proCollectorA.getPQ + "\n")
+    println("PC after super= " + proCollectorB.getPC)
+    println("PQ after super = " + proCollectorB.getPQ + "\n")
    // csv.writeFile(Config.file, Config.append)
 
 //        if (true) {
@@ -258,8 +262,10 @@ object SequentialDirtyMainPrefix extends App {
             val p = if (smBool) "sm-" else ""
             val name = p+CoCl + "-" + ro + "-" + ff +  Config.dataset1 + "-" + Config.dataset2
 
-            val PC = (proCollector.getPC).toString
-            val PQ = (proCollector.getPQ*1000).toString
+            val PCA = (proCollectorA.getPC).toString
+            val PQA = (proCollectorA.getPQ).toString
+            val PCB = (proCollectorB.getPC).toString
+            val PQB = (proCollectorB.getPQ).toString
             val BBT = (tTokenizer + tBlocker + tStoreModel).toString
             val CCT = tCompCleaner.toString
             val MAT = tMatcher.toString
@@ -268,7 +274,7 @@ object SequentialDirtyMainPrefix extends App {
             val BBC = cBlocker.toString
             val CCC = cCompCleaner.toString
 
-            val line = List[String](name, CoCl, "PC", PC,"PQ", PQ, "BBC ", BBC, "CCC ", CCC, "BBT", BBT, "CCT", CCT, "MAT", MAT, "OT", OT, "ODT", ODT)
+            val line = List[String](name, CoCl, "PCA", PCA,"PQA", PQA,"PCB", PCB,"PQB", PQB, "BBC ", BBC, "CCC ", CCC, "BBT", BBT, "CCT", CCT, "MAT", MAT, "OT", OT, "ODT", ODT)
             csv.newLine(line)
             csv.writeFile(Config.file, Config.append)
 

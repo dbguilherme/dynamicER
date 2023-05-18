@@ -43,39 +43,26 @@ class WNP3CompCleaner(dp: AbstractDuplicatePropagation, supervisedApproach: Int,
   }
 
 
-  def getClassifier(id: Int): AbstractClassifier = {
-
-    val learner =id match {
-      case 0 =>{ println("------------NaiveBayes-----------------") ; var l=new NaiveBayes; l      }
-      case 1 =>{       println("------------HoeffdingOptionTree -----------------", thSupervised, ""); var l=     new HoeffdingOptionTree; l.noPrePruneOption; l   }
-      case 2 =>{       println("------------AdaHoeffdingOptionTree -----------------", thSupervised, "");         new AdaHoeffdingOptionTree      }
-      case 3 =>{       println("------------AdaHoeffdingOptionTree -----------------", thSupervised, "");         new AdaHoeffdingOptionTree      }
-    }
-//    if (supervisedApproach == 0) {
-//      println("------------NaiveBayes-----------------")
-//      var learner = new NaiveBayes;
-//    } else if (supervisedApproach == 1) {
-//      var i:Int=100
-//      println("------------HoeffdingOptionTree -----------------", thSupervised, "")
-//      var learner = new HoeffdingOptionTree;
-//      learner.gracePeriodOption.setValue(thSupervised.toInt);
-//    } else if (supervisedApproach == 2) {
-//      println("------------AdaHoeffdingOptionTree -----------------", thSupervised, "")
-//      var learner = new AdaHoeffdingOptionTree;
-//    } else if (supervisedApproach == 3) {
-//      println("------------AdaHoeffdingOptionTree -----------------", thSupervised, "")
-//      var learner = new AdaHoeffdingOptionTree;
-//    }
-//    println(i)
-    learner
-
-  }
-
   private def createClassifier() = {
     //learner = new HoeffdingTree()
     //var learner = new HoeffdingTree;//new NaiveBayes();
     //var learner=new NaiveBayes;
-    var learner = getClassifier(supervisedApproach)
+    val learner = supervisedApproach match {
+      case 0 => {
+        println("------------NaiveBayes-----------------");
+        var l = new NaiveBayes; l
+      }
+      case 1 => {
+        println("------------HoeffdingOptionTree -----------------", thSupervised, "");
+        var l = new HoeffdingOptionTree; l.noPrePruneOption; l
+      }
+      case 2 => {
+        println("------------AdaHoeffdingOptionTree -----------------", thSupervised, ""); new AdaHoeffdingOptionTree
+      }
+      case 3 => {
+        println("------------AdaHoeffdingOptionTree -----------------", thSupervised, ""); new AdaHoeffdingOptionTree
+      }
+    }
 
 
     println("learner is ", learner.getModel.toString)
@@ -132,7 +119,9 @@ class WNP3CompCleaner(dp: AbstractDuplicatePropagation, supervisedApproach: Int,
       comparisons
     else {
       val clean_comparisons = List.newBuilder[Comparison]
-      var cmps = removeRedundantComparisons(comparisons)
+      var cmps=comparisons
+      //var cmps = removeRedundantComparisons(comparisons)
+
       val w = cmps.foldLeft(0.0)( (v, c) => v + c.sim).toDouble / cmps.size
       //cmps = cmps.filter(_.sim >= w/3)
 
@@ -177,8 +166,6 @@ class WNP3CompCleaner(dp: AbstractDuplicatePropagation, supervisedApproach: Int,
         var votes=Utils.maxIndex(learner.getVotesForInstance(inst))
         if (votes==1)
           clean_comparisons.addOne(cmp)
-        //  {
-
 
         if (a || b) {
           if (votes == 1) {
@@ -186,7 +173,8 @@ class WNP3CompCleaner(dp: AbstractDuplicatePropagation, supervisedApproach: Int,
           }
           else {
             Fn += 1
-            //println("instancia ", inst.toString , " ", numberSamplesPos)
+            if (cmp.blockingKey>6)
+              println("instancia ", inst.toString , " ", numberSamplesPos, " ", cmp.blockingKey, "  ",  cmp.prefixString)
           }
         }
         else {

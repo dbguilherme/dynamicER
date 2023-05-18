@@ -11,10 +11,7 @@ import java.util
 
 class WNP2CompCleaner(dp: AbstractDuplicatePropagation, id:Int) extends HSCompCleaner {
 
-
-
     protected val duplicates=dp.getDuplicates
-
     private var Tp: Int = 0;
     private var numberSamples: Int = 0;
     private var numberSamplesPos: Int = 0;
@@ -42,7 +39,7 @@ class WNP2CompCleaner(dp: AbstractDuplicatePropagation, id:Int) extends HSCompCl
     }
     override def getRecall(): Double = {
         0.0
-      }
+    }
 
     override def getPrecision(): Double = {
       0.0

@@ -10,7 +10,7 @@ class TokenBlockerRefiner(size1: Int, size2: Int = 0, ro: Double = 0.005, ff: Do
   // Tokens to blacklist
   val criminalTokens = mutable.HashSet[String]()
   val maxBlockSize = Array(ro*size1, ro*size2)
-  var threshold =0.9
+  var threshold =0.5
   //println("ro: " + ro + "   ff: " + ff)
   println(s"TokenBlockerRefiner mbs1=${maxBlockSize(0)} ;; mbs2=${maxBlockSize(1)}")
   //System.in.read()
@@ -143,8 +143,8 @@ class TokenBlockerRefiner(size1: Int, size2: Int = 0, ro: Double = 0.005, ff: Do
 
 
     //corta os blocos com tamanho maior que 10 TESTE
-    //val xxx = associatedBlocks.filter(_._2.size<10)
-    val blocks = associatedBlocks.map(a => a._2.toList)
+    val xxx = associatedBlocks.filter(_._2.size<100)
+    val blocks = xxx.map(a => a._2.toList)
     val teste = associatedBlocks.map(a => a._1)
     val tuple = (idx, textModel, blocks,teste)
 
