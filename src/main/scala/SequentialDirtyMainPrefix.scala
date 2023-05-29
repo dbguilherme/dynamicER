@@ -79,7 +79,7 @@ object SequentialDirtyMainPrefix extends App {
     val csv = new CsvWriter("time")
 
 
-    val writer = new  CsvWriter("teste.csv")
+    val writer = new  CsvWriter(header="x,y,z\n")
 
     /** STEP 3. iterative computation -> (Assume CCER) **/
     var i = 0
@@ -197,12 +197,12 @@ object SequentialDirtyMainPrefix extends App {
 //        }
 
         i += 1
-        val lisa= List[String](compCleaner.getTotalSize().toString,(compCleaner.getTotalSize()/i).toString)
+        val lisa= List[String](i.toString, compCleaner.getTotalSize().toString,(compCleaner.getTotalSize()/i).toString)
         writer.newLine(lisa)
     }
 
 
-    writer.writeFile("teste.csv", true)
+    writer.writeFile("./plot/"+Config.dataset1+".csv", false)
     //println("\nFrequencia dos Tokens:\n" + TokenBlocker.frequencyTokens.toString)
 
     //proCollector.printLast()

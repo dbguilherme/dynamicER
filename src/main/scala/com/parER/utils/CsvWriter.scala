@@ -23,6 +23,7 @@ class CsvWriter(header: String) {
       flag=true
     }
     var bw = new BufferedWriter(new FileWriter(file, append))
+    bw.write(header)
     if (flag){
       bw.write(header)
       bw.newLine()
