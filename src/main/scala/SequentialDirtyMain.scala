@@ -117,8 +117,9 @@ object SequentialDirtyMain extends App {
         tCollector += (System.currentTimeMillis() - t)
 
         i += 1
+        println(compCleaner.getTotalSize()/n, "  ", i)
     }
-    println("recall---", compCleaner.getRecall(), " ---precision--- ", compCleaner.getPrecision() , "  cost  ", labelcost)
+
     proCollector.printLast()
 
     println("\nTime measurements: ")

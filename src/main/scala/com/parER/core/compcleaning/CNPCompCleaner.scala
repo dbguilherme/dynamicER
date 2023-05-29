@@ -23,4 +23,6 @@ class CNPCompCleaner(dp: AbstractDuplicatePropagation, id:Int) extends HSCompCle
   override def execute(id: Int, model: TokenNGrams, ids: List[Int]): (Int, TokenNGrams, List[Int]) = (id, model, ids)
 
   override def getLabelCost(): Int = 0
+
+  override def getTotalSize(): Int = ???
 }

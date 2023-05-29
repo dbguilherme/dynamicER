@@ -2,11 +2,8 @@ package com.parER.core.compcleaning
 
 import com.parER.datastructure.Comparison
 import com.yahoo.labs.samoa.instances._
-import moa.classifiers.trees.HoeffdingTree
 import org.scify.jedai.textmodels.TokenNGrams
 import org.scify.jedai.utilities.datastructures.AbstractDuplicatePropagation
-
-import java.util
 
 
 class WNP2CompCleaner(dp: AbstractDuplicatePropagation, id:Int) extends HSCompCleaner {
@@ -25,18 +22,8 @@ class WNP2CompCleaner(dp: AbstractDuplicatePropagation, id:Int) extends HSCompCl
     private var FpO: Int = 0;
     private var FnO: Int = 0;
 
-    private var inst:Instance = createInstance()
-    private var learner: HoeffdingTree = createClassifier()
-    private def createClassifier() = {
-      learner = new HoeffdingTree()
+    private var totalSize : Int=0;
 
-      //val stream = new RandomRBFGenerator();//new NaiveBayes();
-      //stream.prepareForUse();
-
-     // learner.setModelContext(stream.getHeader());
-      learner.prepareForUse();
-      learner
-    }
     override def getRecall(): Double = {
         0.0
     }
@@ -45,38 +32,24 @@ class WNP2CompCleaner(dp: AbstractDuplicatePropagation, id:Int) extends HSCompCl
       0.0
     }
 
-    private def createInstance(): DenseInstance = {
-      // generates the name of the features which is called as InstanceHeader
+   override def getTotalSize():Int = {
+    totalSize
+  }
 
-      var attributes = new util.ArrayList[Attribute]()
-      for (i <- 0 until 6) {
-        attributes.add(new Attribute("feature_" + i))
-      }
-      // create instance header with generated feature name
-      val
-      streamHeader = new InstancesHeader(new Instances("Instance", attributes, 10));
-      streamHeader.setClassIndex(5)
-      // generates random data
-      val data = new Array[Double](6)
-
-      // creates an instance and assigns the data
-      val instance = new DenseInstance(1.0, data)
-      // assigns the instanceHeader(feature name)
-      instance.setDataset(streamHeader)
-
-      instance
-    }
 
   override def execute(comparisons: List[Comparison]) = {
     if (comparisons.size == 0)
       comparisons
     else {
       var cmps = removeRedundantComparisons(comparisons)
-     // val w = cmps.foldLeft(0.0)( (v, c) => v + c.sim).toDouble / cmps.size
-    //  cmps = cmps.filter(_.sim >= w)
+   //   val w = cmps.foldLeft(0.0)( (v, c) => v + c.sim).toDouble / cmps.size
+   //   cmps = cmps.filter(_.sim >= w)
 
-
+      //if (cmps.size>10)
+      //  println(id, "size is ", cmps.size)
+      totalSize+=cmps.size
       cmps
+
     }
   }
 

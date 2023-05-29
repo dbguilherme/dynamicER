@@ -35,4 +35,6 @@ class SuffixFilterFilter extends ComparisonCleaning{
   override def execute(id: Int, model: TokenNGrams, ids: List[Int]): (Int, TokenNGrams, List[Int]) = ???
 
   override def getLabelCost(): Int = ???
+
+   def getTotalSize(): Int = ???
 }

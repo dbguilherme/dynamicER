@@ -39,6 +39,7 @@ class CsvWriter(header: String) {
 }
 
 object CsvWriter {
+
   def apply(header: List[String]) = {
     var sb = new StringBuilder
     for (h <- header)

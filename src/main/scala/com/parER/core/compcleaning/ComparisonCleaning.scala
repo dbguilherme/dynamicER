@@ -11,6 +11,8 @@ trait ComparisonCleaning {
 
   //function to return the variable labelcost
   def getLabelCost(): Int
+
+
 }
 
 object ComparisonCleaning {

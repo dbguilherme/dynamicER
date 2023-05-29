@@ -1,5 +1,4 @@
 
-import SequentialDirtyMain.labelcost
 import com.parER.core.blocking.{Blocking, CompGeneration, StoreModel}
 import com.parER.core.collecting.ProgressiveCollector
 import com.parER.core.compcleaning.{ComparisonCleaning, PositionalFilter}
@@ -78,6 +77,9 @@ object SequentialDirtyMainPrefix extends App {
     val t1 = System.currentTimeMillis()
 
     val csv = new CsvWriter("time")
+
+
+    val writer = new  CsvWriter("teste.csv")
 
     /** STEP 3. iterative computation -> (Assume CCER) **/
     var i = 0
@@ -193,15 +195,20 @@ object SequentialDirtyMainPrefix extends App {
 //        if (i%1000==0) {
 //            println("Registro " + i + " de " + proCollector.getPC())
 //        }
+
         i += 1
+        val lisa= List[String](compCleaner.getTotalSize().toString,(compCleaner.getTotalSize()/i).toString)
+        writer.newLine(lisa)
     }
 
+
+    writer.writeFile("teste.csv", true)
     //println("\nFrequencia dos Tokens:\n" + TokenBlocker.frequencyTokens.toString)
 
     //proCollector.printLast()
 
     println(s"\nMax memory: ${maxMemory} MB")
-    println("recall---", compCleaner.getRecall(), " ---precision--- ", compCleaner.getPrecision() , "  cost  ", labelcost)
+   // println("recall---", compCleaner.getRecall(), " ---precision--- ", compCleaner.getPrecision() , "  compCleaner.getTotalsize()  ", compCleaner.getTotalSize())
     println("\n------------------------------ \n------------------------------ \n\nTime measurements:\n")
 
     println("tTokenizer = " + tTokenizer.toInt + " ms")

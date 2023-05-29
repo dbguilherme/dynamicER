@@ -8,6 +8,7 @@ import scala.collection.mutable
 
 class HSCompCleaner  extends ComparisonCleaning {
 
+
   val ccer = Config.ccer
 
   override def execute(comparisons: List[Comparison]) = {
@@ -60,14 +61,7 @@ class HSCompCleaner  extends ComparisonCleaning {
     distinctAndCount(comparisons, _.e1, 0)
   }
 
-  def getRecall ():Double={
-    0.0
-  }
-
-
-  def getPrecision(): Double = {
-    0.0
-  }
+  def getRecall ():Double={0.0 }
 
 
   private def distinctAndCount(comparisons: List[Comparison], f: Comparison => Int, idx: Int) = {
@@ -129,4 +123,11 @@ class HSCompCleaner  extends ComparisonCleaning {
 //  }
 
   override def getLabelCost(): Int = 0
+
+  def getPrecision(): Double = {
+    0.0
+  }
+  def getTotalSize(): Int = {
+    0
+  }
 }
