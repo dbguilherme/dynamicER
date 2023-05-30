@@ -15,6 +15,7 @@ class JSMatcher extends Matcher {
       })
   }
 
+
   override def execute(cmp: Comparison): Comparison = {
     cmp.sim = cmp.e1Model.getSimilarity(cmp.e2Model)
     cmp
