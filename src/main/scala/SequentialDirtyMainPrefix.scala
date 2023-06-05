@@ -196,6 +196,7 @@ object SequentialDirtyMainPrefix extends App {
 //            println("Registro " + i + " de " + proCollector.getPC())
 //        }
 
+
         i += 1
         val lisa= List[String](i.toString, compCleaner.getTotalSize().toString,(compCleaner.getTotalSize()/i).toString)
         writer.newLine(lisa)

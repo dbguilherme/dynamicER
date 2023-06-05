@@ -10,7 +10,7 @@ class TokenBlockerRefiner(size1: Int, size2: Int = 0, ro: Double = 0.005, ff: Do
   // Tokens to blacklist
   val criminalTokens = mutable.HashSet[String]()
   val maxBlockSize = Array(ro*size1, ro*size2)
-  var threshold =0.6
+  var threshold =0.7
   //println("ro: " + ro + "   ff: " + ff)
   println(s"TokenBlockerRefiner mbs1=${maxBlockSize(0)} ;; mbs2=${maxBlockSize(1)}")
   //System.in.read()
@@ -78,7 +78,7 @@ class TokenBlockerRefiner(size1: Int, size2: Int = 0, ro: Double = 0.005, ff: Do
      **/
 
     var prefix = 0
-    val n = 500
+    val n = 10
     if(idx < n)
       prefix = keysFreqRegistro.size
     else
