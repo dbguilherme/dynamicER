@@ -6,7 +6,7 @@ from scipy.signal import find_peaks
 
 def fpeaks(x, y):
     #Find peaks
-    peaks = find_peaks(y, height =100, threshold = 5, distance = 5)
+    peaks = find_peaks(y, height =100, threshold = 10, distance = 5)
     height = peaks[1]['peak_heights'] #list of the heights of the peaks
     peak_pos=[]
     for i in peaks[0]:
@@ -40,24 +40,25 @@ def slop(x,y):
 def plot_graph_from_csv(file_paths):
     fig, ax = plt.subplots()
 
-    for file_path in file_paths:
-        data = pd.read_csv(file_path)
-        x = data['x']
-        y = data['y']
-        z = data['z']
-        ax.plot(x, y/10000, label=file_path)
+    #for file_path in file_paths:
+    data = pd.read_csv(file_paths)
+    x = data['x']
+    y = data['y']
+    z = data['z']
 
-        (x_axis, slopVector)=slop(x,y)
+    ax.plot(x, y/10000, label=file_paths)
 
-        ax.plot(x_axis[0:len(slopVector)], slopVector[0:len(x_axis)], label="line")
+    (x_axis, slopVector)=slop(x,y)
 
-        (peak_pos, height)=fpeaks(x_axis,slopVector)
-        print("pICOS SÃO :",peak_pos)
-        ax.scatter(peak_pos, height, color = 'r', s = 15, marker = 'D', label = 'Maxima')
-        # ax.scatter(min_pos, min_height*-1, color = 'gold', s = 15, marker = 'X', label = 'Minima')
-        ax.legend()
-        ax.grid()
-        plt.show()
+    ax.plot(x_axis[0:len(slopVector)], slopVector[0:len(x_axis)], label="line")
+
+    (peak_pos, height)=fpeaks(x_axis,slopVector)
+    print("pICOS SÃO :",peak_pos)
+    ax.scatter(peak_pos, height, color = 'r', s = 15, marker = 'D', label = 'Maxima')
+    # ax.scatter(min_pos, min_height*-1, color = 'gold', s = 15, marker = 'X', label = 'Minima')
+    ax.legend()
+    ax.grid()
+    plt.show()
 
     ax.set_xlabel('X')
     ax.set_ylabel('Y')
@@ -67,6 +68,7 @@ def plot_graph_from_csv(file_paths):
 
 # Example usage
 
-file_paths = ['movies.csv']
-#file_paths = ['cddb.csv', 'amazonGp.csv', "10K.csv", "dblpAcm.csv"]
-plot_graph_from_csv(file_paths)
+file_paths = ['dblpAcm.csv']
+file_paths = ['cddb.csv', 'amazonGp.csv', "10K.csv", "dblpAcm.csv", "movies.csv"]
+for i in file_paths:
+    plot_graph_from_csv(i)

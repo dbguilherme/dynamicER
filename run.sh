@@ -3,7 +3,7 @@
 echo "Starting execution of DynamicEr with new filter process"
 
 datasets=("10K" "amazonGp" "dblpAcm" "cddb" "dblpScholar" "movies")
-datasets=("dblpAcm")
+#datasets=("dblpAcm")
 
 rm out.csv
 for i in ${datasets[@]}

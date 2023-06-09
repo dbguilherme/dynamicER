@@ -21,7 +21,7 @@ object Config {
   var prioritizer = ""
   var pOption = 500L
   var pOption2 = 50L
-  var print = true
+  var print = false
   var blocker = "tbr"
   var ccMethod = "wnp2"
   var matcher = "js"
