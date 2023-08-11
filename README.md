@@ -1,7 +1,7 @@
 # End-to-end Task Based Parallelization for Entity Resolution on Dynamic Data
 This is the source code for the framework proposed in the paper
  
- L. Gazzarri, and M. Herschel. "End-to-end Task Based Parallelization for Entity Resolution on Dynamic Data." ICDE 2021
+L. Gazzarri, and M. Herschel. "End-to-end Task Based Parallelization for Entity Resolution on Dynamic Data." ICDE 2021
 
 #### Datasets
 All the datasets have been downloaded from the [JedAI](https://github.com/scify/JedAIToolkit/) repository.
