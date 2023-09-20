@@ -30,6 +30,7 @@ class TokenBlocker extends Blocking {
     // update indexes
     invertedIndex.update(idx, textModel, keys, modelStoring)
 
+    //invertedIndex.frequencyblocks
     comparisons
   }
 

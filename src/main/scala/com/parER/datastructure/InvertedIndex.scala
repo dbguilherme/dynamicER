@@ -1,9 +1,11 @@
 package com.parER.datastructure
 
 import com.parER.core.Config
+import gnu.trove.iterator.TObjectIntIterator
+import gnu.trove.map.hash.TObjectIntHashMap
 import org.scify.jedai.textmodels.TokenNGrams
 
-import scala.collection.mutable.{HashMap, ListBuffer}
+import scala.collection.mutable.{ArrayBuffer, HashMap, ListBuffer}
 
 class InvertedIndex {
 
@@ -13,16 +15,21 @@ class InvertedIndex {
   val modelIndex = Array( HashMap[Int, TokenNGrams](), HashMap[Int, TokenNGrams]())
   val ccer = Config.ccer
   var maiorBloco = 0L
+  var tokenStore=""
+  val frequencyblocks = new TObjectIntHashMap[String]
 
+  var  zeroValues = ArrayBuffer[String]()
   def update(idx: Int, textModel: TokenNGrams, textModelTokens: List[String], storeModel: Boolean = true): Unit = {
     val (mi, ii) = getIndexesForUpdate(textModel.getDatasetId)
     for (token <- textModelTokens) {
       ii(token) += idx //Para cada bloco selecionado insere o id do registro de consulta
-      //if ( ii(token).size > maiorBloco)
-      //  maiorBloco = ii(token).size
+      if ( ii(token).size > maiorBloco) {
+        maiorBloco = ii(token).size
+        tokenStore=token;
+      }
     }
-    //println("Tamanho Indice Invertido: " + ii.size)
-    //println("Tamanho Maior Bloco: " + maiorBloco)
+    println("Tamanho Indice Invertido: " + ii.size)
+    println("Tamanho Maior Bloco: " + maiorBloco)
     if (storeModel)
       mi(idx) = textModel //Atualiza o textModel do registro inserido (idx)
   }
@@ -86,7 +93,14 @@ class InvertedIndex {
       else
         l.addOne((t, block)) //Insere bloco em l
       /** Block Pruning retirado **/
+
+
+      if (!frequencyblocks.increment(t)) {
+        frequencyblocks.put(t, 1)
+        // Manually filter keys with values equal to zero
+      }
     }
+
     (l.result(), l0.result())
   }
 

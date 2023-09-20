@@ -10,7 +10,7 @@ class TokenBlockerRefiner(size1: Int, size2: Int = 0, ro: Double = 0.005, ff: Do
   // Tokens to blacklist
   val criminalTokens = mutable.HashSet[String]()
   val maxBlockSize = Array(ro*size1, ro*size2)
-  var threshold =0.6
+  var threshold =0.35
   //println("ro: " + ro + "   ff: " + ff)
   println(s"TokenBlockerRefiner mbs1=${maxBlockSize(0)} ;; mbs2=${maxBlockSize(1)}")
   //System.in.read()
@@ -167,6 +167,7 @@ class TokenBlockerRefiner(size1: Int, size2: Int = 0, ro: Double = 0.005, ff: Do
     //var (associatedBlocks, blocksToRemove) = allAssociatedBlocks.partition(_._2.size+1 < maxBlockSize(dId))
     var (associatedBlocks, associatedBlocksWithZeroSize) = invertedIndex.
       partitionedAssociatedBlocks(idx, dId, keys)
+
 
     //println("Blocos Sem Registros: " + associatedBlocksWithZeroSize.size)
     //println(associatedBlocksWithZeroSize.toList)

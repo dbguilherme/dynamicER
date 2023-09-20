@@ -94,12 +94,12 @@ object SequentialDirtyMainPrefix extends App {
         var tTotalRegistro = 0.0D
 
 
-        if (i == 27674) {
-          //  println("string é obj1 11003: ")
-//            println("profile ", profiles1(27674).getAttributes.asScala)
-//            println("profile ", profiles1(3031).getAttributes.asScala)
-            //println(" string é cmp ", comps1(61).e2Model.getItemsFrequency.keySet())
-        }
+//        if (i == 27674) {
+//          //  println("string é obj1 11003: ")
+////            println("profile ", profiles1(27674).getAttributes.asScala)
+////            println("profile ", profiles1(3031).getAttributes.asScala)
+//            //println(" string é cmp ", comps1(61).e2Model.getItemsFrequency.keySet())
+//        }
 
 
         //tInicial = System.currentTimeMillis() //Retorna um inteiro long em millesegundos
@@ -169,9 +169,6 @@ object SequentialDirtyMainPrefix extends App {
         tTotalRegistro += (System.nanoTime() - t) * 1E-6
         //println("Pares Candidatos Apos Meta-blocking = " + comps1.size)
         //println("Pares Candidatos Sem Redundancia = " + comps1.size) //comps1.toList
-
-
-
 
         t = System.nanoTime()
         comps1 = compMatcher.execute(comps1) //Calcula similaridade de jaccard igual a 0
