@@ -18,7 +18,7 @@ class ProgressiveCollector(t0: Long, t1: Long, dp: AbstractDuplicatePropagation,
   val duplicates = dp.getDuplicates.asScala
   val buffer = new ListBuffer[String]()
   val nworkers = Config.workers
-
+  val memoryused= Runtime.getRuntime.totalMemory - Runtime.getRuntime.freeMemory
   def execute(comparisons: List[Comparison]) = {
     //println("new block ")
 
@@ -80,7 +80,10 @@ class ProgressiveCollector(t0: Long, t1: Long, dp: AbstractDuplicatePropagation,
       val t = System.currentTimeMillis()
       val dt0 = t - t0
       val dt1 = t - t1
-      val s = s"${ecX}\t${nworkers}\t${dt0}\t${dt1}\t${rec}\t${em}\t${duplicates.size}\t${if (Config.filling) 1 else 0} \t ${ec}"
+      val afterUsedMem = Runtime.getRuntime.totalMemory - Runtime.getRuntime.freeMemory
+      val actualMemUsed = (afterUsedMem - memoryused)/ (1024 * 1024)
+     // println("memory used is " + actualMemUsed / (1024 * 1024) + " mb")
+      val s = s"--${ecX}\t${nworkers}\t${dt0}\t${dt1}\t${rec}\t${em}\t${duplicates.size}\t${if (Config.filling) 1 else 0} \t ${ec} \t ${actualMemUsed}"
       buffer.addOne(s)
       println(s)
     }

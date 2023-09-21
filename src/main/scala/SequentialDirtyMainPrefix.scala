@@ -15,6 +15,7 @@ object SequentialDirtyMainPrefix extends App {
 
     val maxMemory = Runtime.getRuntime().maxMemory()  / math.pow(10, 6)
 
+    val beforeUsedMem = Runtime.getRuntime.totalMemory - Runtime.getRuntime.freeMemory
     /**  Time variables **/
     var tTokenizer = 0.0D //0L para long e 0.0D para double
     var tBlocker = 0.0D
@@ -198,7 +199,9 @@ object SequentialDirtyMainPrefix extends App {
         writer.newLine(lisa)
     }
 
-
+    val afterUsedMem = Runtime.getRuntime.totalMemory - Runtime.getRuntime.freeMemory
+    val actualMemUsed = afterUsedMem - beforeUsedMem
+    println("memory used is "+ actualMemUsed/(1024*1024)  +" mb")
     writer.writeFile("./plot/"+Config.dataset1+".csv", false)
     //println("\nFrequencia dos Tokens:\n" + TokenBlocker.frequencyTokens.toString)
 

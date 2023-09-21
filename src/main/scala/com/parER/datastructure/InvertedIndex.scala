@@ -1,8 +1,6 @@
 package com.parER.datastructure
 
 import com.parER.core.Config
-import gnu.trove.iterator.TObjectIntIterator
-import gnu.trove.map.hash.TObjectIntHashMap
 import org.scify.jedai.textmodels.TokenNGrams
 
 import scala.collection.mutable.{ArrayBuffer, HashMap, ListBuffer}
@@ -16,7 +14,8 @@ class InvertedIndex {
   val ccer = Config.ccer
   var maiorBloco = 0L
   var tokenStore=""
-  val frequencyblocks = new TObjectIntHashMap[String]
+  val frequencyblocks =  collection.mutable.Map[String, Integer]().withDefaultValue(0)
+
 
   var  zeroValues = ArrayBuffer[String]()
   def update(idx: Int, textModel: TokenNGrams, textModelTokens: List[String], storeModel: Boolean = true): Unit = {
@@ -28,8 +27,42 @@ class InvertedIndex {
         tokenStore=token;
       }
     }
-    println("Tamanho Indice Invertido: " + ii.size)
-    println("Tamanho Maior Bloco: " + maiorBloco)
+    //val temp=frequencyblocks.filter(_._2==1)
+
+
+    if (ii.size> 40000)
+    {
+      val keys = frequencyblocks.keys.toIndexedSeq
+      for (i <- 1 to 100) {
+        val randomNum =  1+(Math.random * (keys.size-i)).asInstanceOf[Int]
+        val randomKey = keys(randomNum)
+        frequencyblocks -= randomKey
+        ii.remove(randomKey)
+        val key =ii.maxBy { case (_, values) => values.size }
+      //  println(s"Removed key with highest size: $key ${ii.get(key._1)}")
+        ii -=key._1;
+        // println(s"Removed key with highest size: $key")
+
+//        ii.filter {
+//          case (_, docList) => docList.size < 100
+//        }
+
+//        ii.foreach {
+//          case (term, docList) =>
+//            println(s"Term: $term, size  ${docList.size} Documents: ${docList.mkString(", ")} ")
+//        }
+      }
+      //println("Tamanho Indice Invertido: " + ii.size +" removed key is " + randomKey + frequencyblocks.get(randomKey))
+      //println("Tamanho Indice Invertido: " + ii.size +" removed key is " + randomKey + frequencyblocks.get(key))
+    }
+
+
+//    println("Tamanho Indice Invertido: " + ii.size)
+//    println("Tamanho Maior Bloco: " + maiorBloco)
+//    if (ii.size> 20000) {
+//        println("maior que 20000")
+//         val x= frequencyblocks.filter(_._2>0)
+//    }
     if (storeModel)
       mi(idx) = textModel //Atualiza o textModel do registro inserido (idx)
   }
@@ -95,10 +128,17 @@ class InvertedIndex {
       /** Block Pruning retirado **/
 
 
-      if (!frequencyblocks.increment(t)) {
-        frequencyblocks.put(t, 1)
-        // Manually filter keys with values equal to zero
-      }
+     if(frequencyblocks.get(t)==None) {
+       frequencyblocks.addOne(t,1)
+     }else {
+       frequencyblocks.remove(t)
+     }
+      //  val temp=frequencyblocks.filter(_._2==1);
+//      if (temp.size>1) {
+//        println("values equal to 1  "+ temp.size + " index size "+ ii.size + " "+ temp.size.toDouble/ii.size )
+//      }
+      // Manually filter keys with values equal to zero
+
     }
 
     (l.result(), l0.result())
