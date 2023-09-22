@@ -16,24 +16,32 @@ class InvertedIndex {
   var tokenStore=""
   val frequencyblocks =  collection.mutable.Map[String, Integer]().withDefaultValue(0)
 
+  val frequencyAllblocks =  collection.mutable.Map[String, Integer]().withDefaultValue(0)
+
 
   var  zeroValues = ArrayBuffer[String]()
   def update(idx: Int, textModel: TokenNGrams, textModelTokens: List[String], storeModel: Boolean = true): Unit = {
     val (mi, ii) = getIndexesForUpdate(textModel.getDatasetId)
     for (token <- textModelTokens) {
-      ii(token) += idx //Para cada bloco selecionado insere o id do registro de consulta
-      if ( ii(token).size > maiorBloco) {
-        maiorBloco = ii(token).size
-        tokenStore=token;
+      var s = ""
+      if (token.length > 3)
+        s = token.substring(0, 3)
+      else
+        s = token
+
+      ii(s) += idx //Para cada bloco selecionado insere o id do registro de consulta
+      if ( ii(s).size > maiorBloco) {
+        maiorBloco = ii(s).size
+        tokenStore=s;
       }
     }
     //val temp=frequencyblocks.filter(_._2==1)
 
 
-    if (ii.size> 40000)
+    if (ii.size> 5000000)
     {
       val keys = frequencyblocks.keys.toIndexedSeq
-      for (i <- 1 to 100) {
+      for (i <- 1 to 10) {
         val randomNum =  1+(Math.random * (keys.size-i)).asInstanceOf[Int]
         val randomKey = keys(randomNum)
         frequencyblocks -= randomKey
@@ -119,20 +127,27 @@ class InvertedIndex {
     var i = 0
     for (t <- keys)
     {
-      i += 1
-      val block = ii(t)
-      if (block.size == 0)
-        l0.addOne((t, block)) //Insere na lista l0 de blocos com tamanho zero (associatedBlocksWithZeroSize)
+      var s=""
+      if (t.length>3)
+        s=t.substring(0,3)
       else
-        l.addOne((t, block)) //Insere bloco em l
+        s=t
+      i += 1
+      val block = ii(s)
+      if (block.size == 0)
+        l0.addOne((s, block)) //Insere na lista l0 de blocos com tamanho zero (associatedBlocksWithZeroSize)
+      else
+        l.addOne((s, block)) //Insere bloco em l
       /** Block Pruning retirado **/
 
 
-     if(frequencyblocks.get(t)==None) {
-       frequencyblocks.addOne(t,1)
+     if(frequencyblocks.get(s)==None) {
+       frequencyblocks.addOne(s,1)
      }else {
-       frequencyblocks.remove(t)
+       frequencyblocks.remove(s)
      }
+
+      frequencyAllblocks.update(s,1);
       //  val temp=frequencyblocks.filter(_._2==1);
 //      if (temp.size>1) {
 //        println("values equal to 1  "+ temp.size + " index size "+ ii.size + " "+ temp.size.toDouble/ii.size )
